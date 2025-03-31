@@ -16,8 +16,8 @@
     "addon_config:rw"
   ],
   "options": {},
-  "ports": {
-    "8080/tcp": 8080
+  "expose": {
+    "8080/tcp": {}
   },
   "ports_description": {
     "8080/tcp": "Web interface"
