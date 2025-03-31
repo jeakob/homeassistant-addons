@@ -12,7 +12,7 @@
     "TRILIUM_DATA_DIR": "/config",
     "NO_AUTHENTICATION": "true"
   },
-  "name": "Trilium Next",
+  "name": "Trilium Next - JB",
   "map": [
     "addon_config:rw"
   ],
