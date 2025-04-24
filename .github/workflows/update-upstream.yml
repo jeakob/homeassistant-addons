@@ -2,12 +2,13 @@ name: Update Upstream Version
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Every day at 6 AM UTC
-  workflow_dispatch:     # Allows manual triggering
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  workflow_dispatch:     # Manual trigger
 
 jobs:
   update-version:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,8 +26,9 @@ jobs:
 
       - name: Check & update version files
         run: |
+          ADDON_DIR="triliumnext"
           LATEST_VERSION="${{ steps.get_release.outputs.result }}"
-          CURRENT_VERSION=$(jq -r '.upstream_version' updater.json)
+          CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
 
           echo "Current: $CURRENT_VERSION | Latest: $LATEST_VERSION"
 
@@ -37,16 +39,16 @@ jobs:
 
             # Update updater.json
             jq --arg v "$LATEST_VERSION" --arg d "$TODAY" \
-              '.upstream_version = $v | .last_update = $d' updater.json > tmp && mv tmp updater.json
+              '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp && mv tmp "$ADDON_DIR/updater.json"
 
             # Update config.json
             jq --arg v "$LATEST_VERSION" \
-              '.version = $v | .upstream = $v' config.json > tmp && mv tmp config.json
+              '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
 
             # Commit and push
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add updater.json config.json
+            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json"
             git commit -m "Update to upstream version $LATEST_VERSION"
             git push
           else
