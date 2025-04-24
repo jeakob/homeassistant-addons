@@ -26,7 +26,7 @@ jobs:
 
       - name: Check & update version files
         run: |
-          ADDON_DIR="homeassistant-addons/trilliumnext"
+          ADDON_DIR="homeassistant-addons/triliumnext"
           LATEST_VERSION="${{ steps.get_release.outputs.result }}"
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
 
@@ -45,7 +45,11 @@ jobs:
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
 
-            # Commit and push
+            # Commit and push directly
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json"
+            git commit -m "Update to upstream version $LATEST_VERSION"
+            git push
+          else
+            echo "No update needed"
