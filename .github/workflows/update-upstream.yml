@@ -1,26 +1,18 @@
 name: Update Upstream Version
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6 AM UTC
-  workflow_dispatch:     # Manual trigger
+    - cron: '0 6 * * *' # every day at 6:00 UTC
 
 jobs:
   update-version:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          submodules: true  # Ensure submodules are checked out if applicable
 
-      - name: List all files to check folder structure
-        run: |
-          echo "Listing all files in the repo to check folder structure"
-          ls -R
-
-      - name: Fetch latest upstream release tag
+      - name: Get latest release from triliumnext/notes
         id: get_release
         uses: actions/github-script@v7
         with:
@@ -52,7 +44,7 @@ jobs:
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
 
-            # Commit and push directly
+            # Commit and push
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json"
@@ -60,3 +52,4 @@ jobs:
             git push
           else
             echo "No update needed"
+          fi
