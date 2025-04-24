@@ -12,11 +12,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: true  # Ensure submodules are checked out if applicable
 
-      - name: List files in the addon directory
+      - name: List all files
         run: |
-          echo "Listing files in the directory homeassistant-addons/triliumnext/"
-          ls -R homeassistant-addons/triliumnext/
+          echo "Listing all files in the repo to check folder structure"
+          ls -R
 
       - name: Fetch latest upstream release tag
         id: get_release
@@ -31,7 +33,7 @@ jobs:
 
       - name: Check & update version files
         run: |
-          ADDON_DIR="homeassistant-addons/triliumnext"
+          ADDON_DIR="./homeassistant-addons/triliumnext"
           LATEST_VERSION="${{ steps.get_release.outputs.result }}"
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
 
