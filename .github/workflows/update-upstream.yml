@@ -1,55 +1,37 @@
-name: Update Upstream Version
+name: Update TriliumNext Addon Version
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * *' # every day at 6:00 UTC
+    - cron: "0 6 * * *" # every day at 6am UTC
 
 jobs:
-  update-version:
+  update-triliumnext-version:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get latest release from triliumnext/notes
-        id: get_release
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const res = await github.rest.repos.getLatestRelease({
-              owner: 'triliumnext',
-              repo: 'notes'
-            });
-            return res.data.tag_name;
+      - name: Install jq
+        run: sudo apt-get install jq -y
 
-      - name: Check & update version files
+      - name: Clone TriliumNext
         run: |
-          ADDON_DIR="./trilliumnext"
-          LATEST_VERSION="${{ steps.get_release.outputs.result }}"
-          CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
+          mkdir -p homeassistant-addons/triliumnext
+          git clone --depth=1 https://github.com/TriliumNext/Notes ./homeassistant-addons/triliumnext
 
-          echo "Current: $CURRENT_VERSION | Latest: $LATEST_VERSION"
+      - name: Get latest release version
+        id: get_version
+        run: |
+          latest=$(curl -s https://api.github.com/repos/TriliumNext/Notes/releases/latest | jq -r .tag_name)
+          echo "{\"version\": \"$latest\"}" > ./homeassistant-addons/triliumnext/updater.json
+          echo "version=$latest" >> $GITHUB_OUTPUT
 
-          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
-            echo "Updating files to version $LATEST_VERSION"
-
-            TODAY=$(date +'%d-%m-%Y')
-
-            # Update updater.json
-            jq --arg v "$LATEST_VERSION" --arg d "$TODAY" \
-              '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp && mv tmp "$ADDON_DIR/updater.json"
-
-            # Update config.json
-            jq --arg v "$LATEST_VERSION" \
-              '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
-
-            # Commit and push
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json"
-            git commit -m "Update to upstream version $LATEST_VERSION"
-            git push
-          else
-            echo "No update needed"
-          fi
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add homeassistant-addons/triliumnext/updater.json
+          git diff --cached --quiet || git commit -m "Update TriliumNext version to ${{ steps.get_version.outputs.version }}"
+          git push
