@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: true  # Ensure submodules are checked out if applicable
 
-      - name: List all files
+      - name: List all files to check folder structure
         run: |
           echo "Listing all files in the repo to check folder structure"
           ls -R
@@ -33,7 +33,7 @@ jobs:
 
       - name: Check & update version files
         run: |
-          ADDON_DIR="./homeassistant-addons/triliumnext"
+          ADDON_DIR="./trilliumnext"
           LATEST_VERSION="${{ steps.get_release.outputs.result }}"
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
 
