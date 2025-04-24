@@ -13,6 +13,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: List files in the addon directory
+        run: |
+          echo "Listing files in the directory homeassistant-addons/triliumnext/"
+          ls -R homeassistant-addons/triliumnext/
+
       - name: Fetch latest upstream release tag
         id: get_release
         uses: actions/github-script@v7
