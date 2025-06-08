@@ -1,4 +1,4 @@
-name: TrilliumNext Update Upstream Version
+name: V2 TrilliumNext Update Upstream Version
 
 on:
   workflow_dispatch:
@@ -21,19 +21,15 @@ jobs:
               owner: 'triliumnext',
               repo: 'notes'
             });
-            return {
-              tag: res.data.tag_name,
-              body: res.data.body
-            };
+            core.setOutput("tag", res.data.tag_name);
+            core.setOutput("body", res.data.body);
 
       - name: Save changelog to file
-        run: |
-          echo "${{ toJson(steps.get_release.outputs) }}" > raw_release.json
-          echo "${{ fromJson(steps.get_release.outputs).body }}" > changelog.txt
+        run: echo "${{ steps.get_release.outputs.body }}" > changelog.txt
 
       - name: Check & update version files
         env:
-          LATEST_VERSION: ${{ fromJson(steps.get_release.outputs).tag }}
+          LATEST_VERSION: ${{ steps.get_release.outputs.tag }}
         run: |
           ADDON_DIR="./trilliumnext"
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
@@ -53,10 +49,10 @@ jobs:
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
 
-            # Save changelog to versioned file
+            # Save changelog with versioned filename
             cp changelog.txt "$ADDON_DIR/CHANGELOG_$LATEST_VERSION.md"
 
-            # Commit and push
+            # Commit and push changes
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json" "$ADDON_DIR/CHANGELOG_$LATEST_VERSION.md"
