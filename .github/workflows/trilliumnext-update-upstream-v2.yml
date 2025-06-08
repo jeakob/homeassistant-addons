@@ -12,26 +12,28 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Get latest release from triliumnext/notes
+      - name: Get latest release info from triliumnext/notes
         id: get_release
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
             const res = await github.rest.repos.getLatestRelease({
               owner: 'triliumnext',
               repo: 'notes'
             });
-            return JSON.stringify({
-              tag_name: res.data.tag_name,
-              body: res.data.body
-            });
 
-      - name: Extract release info
-        id: extract
+            const data = {
+              version: res.data.tag_name,
+              changelog: res.data.body
+            };
+
+            fs.writeFileSync('release.json', JSON.stringify(data));
+
+      - name: Set environment variables and save changelog
         run: |
-          echo '${{ steps.get_release.outputs.result }}' > release.json
-          VERSION=$(jq -r .tag_name release.json)
-          CHANGELOG=$(jq -r .body release.json)
+          VERSION=$(jq -r .version release.json)
+          CHANGELOG=$(jq -r .changelog release.json)
 
           echo "LATEST_VERSION=$VERSION" >> $GITHUB_ENV
           echo "$CHANGELOG" > changelog.txt
@@ -56,7 +58,7 @@ jobs:
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
 
-            # Save changelog
+            # Save changelog to versioned file
             cp changelog.txt "$ADDON_DIR/CHANGELOG_$LATEST_VERSION.md"
 
             # Commit and push
