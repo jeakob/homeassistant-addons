@@ -1,9 +1,9 @@
-name: TrilliumNext Update Upstream Version
+name: V1 TrilliumNext Update Upstream Version
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 6 * * *' # every day at 6:00 UTC
+#on:
+#  workflow_dispatch:
+#  schedule:
+#    - cron: '0 6 * * *' # every day at 6:00 UTC
 
 jobs:
   update-version:
