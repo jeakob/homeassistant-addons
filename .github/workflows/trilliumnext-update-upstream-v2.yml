@@ -27,11 +27,14 @@ jobs:
       - name: Save changelog to file
         run: echo "${{ steps.get_release.outputs.body }}" > changelog.txt
 
+      - name: List trilliumnext folder content (debug)
+        run: ls -l ./trilliumnext
+
       - name: Check & update version files
         env:
           LATEST_VERSION: ${{ steps.get_release.outputs.tag }}
         run: |
-          ADDON_DIR="./homeassistant-addons/trilliumnext"
+          ADDON_DIR="./trilliumnext"
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
 
           echo "Current: $CURRENT_VERSION | Latest: $LATEST_VERSION"
@@ -52,11 +55,11 @@ jobs:
             # Overwrite main changelog file with latest changelog
             cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
 
-            # Commit and push
+            # Commit and push changes
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json" "$ADDON_DIR/CHANGELOG.md"
-            git commit -F changelog.txt -m "Update to upstream version $LATEST_VERSION"
+            git commit -m "Update to upstream version $LATEST_VERSION"
             git push
           else
             echo "No update needed"
