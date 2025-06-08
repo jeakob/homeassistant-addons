@@ -21,15 +21,26 @@ jobs:
               owner: 'triliumnext',
               repo: 'notes'
             });
-            return {
+            return JSON.stringify({
               tag_name: res.data.tag_name,
               body: res.data.body
-            };
+            });
+
+      - name: Extract release info
+        id: extract
+        run: |
+          result='${{ steps.get_release.outputs.result }}'
+          echo "RESULT: $result"
+
+          VERSION=$(echo "$result" | jq -r '.tag_name')
+          CHANGELOG=$(echo "$result" | jq -r '.body')
+
+          echo "LATEST_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Check & update version files
-        env:
-          LATEST_VERSION: ${{ fromJson(steps.get_release.outputs.result).tag_name }}
-          CHANGELOG: ${{ fromJson(steps.get_release.outputs.result).body }}
         run: |
           ADDON_DIR="./trilliumnext"
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
@@ -49,7 +60,7 @@ jobs:
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp && mv tmp "$ADDON_DIR/config.json"
 
-            # Optionally save changelog to a file
+            # Save changelog
             echo "$CHANGELOG" > "$ADDON_DIR/CHANGELOG_$LATEST_VERSION.md"
 
             # Commit and push
