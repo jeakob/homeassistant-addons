@@ -11,7 +11,7 @@ COPY run.sh /
 RUN chmod a+x /run.sh
 
 # Install socat and wget (needed for healthcheck)
-RUN apk add --no-cache socat wget
+RUN apt-get update && apt-get install -y socat wget && rm -rf /var/lib/apt/lists/*
 
 # Home Assistant labels for metadata
 LABEL \
