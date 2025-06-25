@@ -1,94 +1,96 @@
-{
-  "name": "Trilium Next - JB",
-  "version": "v2025.03.12",
-  "slug": "triliumnext",
-  "description": "TriliumNext Notes is a hierarchical note taking application with focus on building large personal knowledge bases. It also supports encryption, Markdown, and other PKB features.",
-  "url": "https://github.com/triliumnext/trilium",
+name: "TriliumNext Notes"
+version: "v2025.03.12"
+slug: trilium_next
+description: "Hierarchical note-taking application with encryption, Markdown support, and personal knowledge base features"
+url: "https://github.com/triliumnext/trilium"
 
-  "ingress": true,
-  "ingress_stream": true,
-  "ingress_port": 8080,
-  "webui": "http://[HOST]:[PORT:8080]/",
-  "panel_icon": "mdi:notebook-multiple",
-  "panel_title": "Trilium Notes",
+ingress: true
+ingress_port: 8080
+ingress_stream: true
+panel_icon: mdi:notebook-multiple
+panel_title: Trilium Notes
+webui: "http://[HOST]:[PORT:8080]/"
 
-  "arch": [
-    "amd64",
-    "aarch64",
-    "armhf",
-    "armv7",
-    "i386"
-  ],
+arch:
+  - amd64
+  - aarch64
 
-  "startup": "application",
-  "boot": "auto",
-  "init": false,
+startup: application
+boot: auto
+init: false
 
-  "map": [
-    "addon_config:rw",
-    {
-      "type": "data",
-      "read_only": false,
-      "path": "/home/node/trilium-data"
-    }
-  ],
+map:
+  - type: data
+    read_only: false
+    path: /home/node/trilium-data
 
-  "expose": {
-    "8080/tcp": {}
-  },
-  "ports_description": {
-    "8080/tcp": "Web interface"
-  },
+expose:
+  "8080/tcp": 8080
 
-  "options": {
-    "NO_AUTHENTICATION": true,
-    "TRILIUM_OAUTH_BASE_URL": "",
-    "TRILIUM_OAUTH_CLIENT_ID": "",
-    "TRILIUM_OAUTH_CLIENT_SECRET": "",
-    "TRILIUM_OAUTH_ISSUER_BASE_URL": "",
-    "TRILIUM_OAUTH_ISSUER_NAME": "",
-    "timezone": "Europe/Berlin",
-    "log_level": "info",
-    "https_only": false
-  },
+options:
+  timezone: "Europe/Berlin"
+  log_level: "info"
+  https_only: false
+  TRILIUM_OAUTH_BASE_URL: ""
+  TRILIUM_OAUTH_CLIENT_ID: ""
+  TRILIUM_OAUTH_CLIENT_SECRET: ""
+  TRILIUM_OAUTH_ISSUER_BASE_URL: ""
+  TRILIUM_OAUTH_ISSUER_NAME: ""
 
-  "schema": {
-    "NO_AUTHENTICATION": { "type": "boolean" },
-    "TRILIUM_OAUTH_BASE_URL": { "type": "string" },
-    "TRILIUM_OAUTH_CLIENT_ID": { "type": "string" },
-    "TRILIUM_OAUTH_CLIENT_SECRET": { "type": "string" },
-    "TRILIUM_OAUTH_ISSUER_BASE_URL": { "type": "string" },
-    "TRILIUM_OAUTH_ISSUER_NAME": { "type": "string" },
-    "timezone": {
-      "type": "select",
-      "options": [
-        "Europe/Berlin",
-        "America/New_York",
-        "UTC",
-        "Asia/Berlin",
-        "Europe/London",
-        "Asia/Tokyo",
-        "Australia/Sydney"
-      ]
-    },
-    "log_level": {
-      "type": "select",
-      "options": [
-        "trace","debug","info","notice","warning","error","fatal"
-      ]
-    },
-    "https_only": { "type": "boolean" }
-  },
+schema:
+  timezone:
+    type: select
+    options:
+      - Europe/Berlin
+      - America/New_York
+      - UTC
+      - Asia/Berlin
+      - Europe/London
+      - Asia/Tokyo
+      - Australia/Sydney
 
-  "environment": {
-    "TRILIUM_DATA_DIR": "/home/node/trilium-data",
-    "NO_AUTHENTICATION": "{{ options.NO_AUTHENTICATION }}",
-    "TZ": "{{ options.timezone }}",
-    "NODE_ENV": "production",
-    "HOST": "0.0.0.0",
-    "TRILIUM_LOG_LEVEL": "{{ options.log_level }}"
-  },
+  log_level:
+    type: select
+    options:
+      - trace
+      - debug
+      - info
+      - notice
+      - warning
+      - error
+      - fatal
 
-  "image": "triliumnext/notes:v2025.03.12",
-  "upstream": "v2025.03.12"
-}
+  https_only:
+    type: boolean
+
+  TRILIUM_OAUTH_BASE_URL:
+    type: string
+    description: "Your app’s base URL"
+
+  TRILIUM_OAUTH_CLIENT_ID:
+    type: string
+    description: "OAuth2 client ID"
+
+  TRILIUM_OAUTH_CLIENT_SECRET:
+    type: string
+    description: "OAuth2 client secret"
+
+  TRILIUM_OAUTH_ISSUER_BASE_URL:
+    type: string
+    description: "OIDC issuer discovery URL (e.g. https://your-oidc-server/.well-known/openid-configuration)"
+
+  TRILIUM_OAUTH_ISSUER_NAME:
+    type: string
+    description: "Display name for the login button (e.g. PocketID)"
+
+environment:
+  TRILIUM_DATA_DIR: "/home/node/trilium-data"
+  TZ: "{{ options.timezone }}"
+  NODE_ENV: "production"
+  HOST: "0.0.0.0"
+  TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
+  TRILIUM_OAUTH_BASE_URL: "{{ options.TRILIUM_OAUTH_BASE_URL }}"
+  TRILIUM_OAUTH_CLIENT_ID: "{{ options.TRILIUM_OAUTH_CLIENT_ID }}"
+  TRILIUM_OAUTH_CLIENT_SECRET: "{{ options.TRILIUM_OAUTH_CLIENT_SECRET }}"
+  TRILIUM_OAUTH_ISSUER_BASE_URL: "{{ options.TRILIUM_OAUTH_ISSUER_BASE_URL }}"
+  TRILIUM_OAUTH_ISSUER_NAME: "{{ options.TRILIUM_OAUTH_ISSUER_NAME }}"
