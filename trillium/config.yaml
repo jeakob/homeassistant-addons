@@ -1,6 +1,6 @@
 ---
 name: "TriliumNext Notes"
-version: "v2025.03.12"
+version: "v0.95.0"
 slug: trilium_next
 description: "Hierarchical note-taking application with encryption, Markdown support, and personal knowledge base features"
 url: "https://github.com/triliumnext/trilium"
@@ -23,13 +23,13 @@ map:
 ports:
   "8080/tcp": 8080
 options:
-# language: en
+  # language: en
   timezone: "Europe/Berlin"
   log_level: "info"
   https_only: false
 schema:
-#  language: |
-#    list(ar|br|ca|cs|de|en|eo|es|fa|fr|hi|it|ja|ko|kz|nl|pl|pt|ru|sv|tl|tr|uk|uz|vi|zh)
+  #  language: |
+  #    list(ar|br|ca|cs|de|en|eo|es|fa|fr|hi|it|ja|ko|kz|nl|pl|pt|ru|sv|tl|tr|uk|uz|vi|zh)
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
   log_level: "list(trace|debug|info|notice|warning|error|fatal)"
@@ -37,7 +37,9 @@ schema:
 environment:
   TRILIUM_DATA_DIR: "/home/node/trilium-data"
   TZ: "{{ options.timezone }}"
-  NODE_ENV: "production" 
+  NODE_ENV: "production"
   HOST: "0.0.0.0"
   TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
 #  TRILIUM_LANGUAGE: "{{ options.language }}"
+
+upstream: v0.95.0
