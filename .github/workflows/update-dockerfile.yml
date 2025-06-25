@@ -1,28 +1,29 @@
-name: Update Dockerfile, Build and Push Image
+name: Update Dockerfile and Build Image
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to main branch
   pull_request:
     branches:
-      - main
+      - main  # Trigger on PR to main branch
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout your repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Clone upstream TriliumNext repo
+      - name: Fetch upstream Dockerfile and required files
         run: |
-          git clone --depth=1 https://github.com/TriliumNext/Notes.git
+          curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine
+          curl -o start-docker.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/start-docker.sh
+          curl -o pnpm-workspace.yaml https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/docker/pnpm-workspace.yaml
 
       - name: Update WORKDIR to /data in Dockerfile
-        run: |
-          sed -i 's|^WORKDIR .*|WORKDIR /data|' Notes/apps/server/Dockerfile.alpine
+        run: sed -i 's|^WORKDIR .*|WORKDIR /data|' Dockerfile
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -32,14 +33,11 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Install dependencies and build
-        working-directory: Notes/apps/server
-        run: |
-          pnpm install
-          pnpm run build
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: .
 
       - name: Build Docker image
-        working-directory: Notes/apps/server
         run: docker build -t jeakob/triliumnext:latest .
 
       - name: Log in to Docker Hub
@@ -48,6 +46,5 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push Docker image
-        run: |
-          docker push jeakob/triliumnext:latest
+      - name: Push Docker image to Docker Hub
+        run: docker push jeakob/triliumnext:latest
