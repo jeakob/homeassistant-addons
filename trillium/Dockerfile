@@ -13,9 +13,6 @@ SHELL ["/bin/bash", "-c"]
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-# Copy the Trilium source code
-COPY trilium/ /usr/src/app/
-
 # Home Assistant metadata
 LABEL \
     io.hass.name="TriliumNext Notes" \
