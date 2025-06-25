@@ -16,24 +16,42 @@ arch:
 startup: application
 boot: auto
 init: false
+
 map:
   - type: data
-    read_only: false
     path: /home/node/trilium-data
-ports:
-  "8080/tcp": 8080
+    read_only: false
+
+expose:
+  "8080/tcp": {}
+
+ports_description:
+  "8080/tcp": "Optional web interface access on port 8080"
+
 options:
-  # language: en
-  timezone: "Europe/Berlin"
+  EXPOSE_RAW_PORT: false
+  NO_AUTHENTICATION: true
+  TRILIUM_OAUTH_BASE_URL: ""
+  TRILIUM_OAUTH_CLIENT_ID: ""
+  TRILIUM_OAUTH_CLIENT_SECRET: ""
+  TRILIUM_OAUTH_ISSUER_BASE_URL: ""
+  TRILIUM_OAUTH_ISSUER_NAME: ""
+  timezone: "Europe/London"
   log_level: "info"
   https_only: false
+
 schema:
-  #  language: |
-  #    list(ar|br|ca|cs|de|en|eo|es|fa|fr|hi|it|ja|ko|kz|nl|pl|pt|ru|sv|tl|tr|uk|uz|vi|zh)
-  timezone: |
-    list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
+  EXPOSE_RAW_PORT: bool
+  NO_AUTHENTICATION: bool
+  TRILIUM_OAUTH_BASE_URL: str
+  TRILIUM_OAUTH_CLIENT_ID: str
+  TRILIUM_OAUTH_CLIENT_SECRET: str
+  TRILIUM_OAUTH_ISSUER_BASE_URL: str
+  TRILIUM_OAUTH_ISSUER_NAME: str
+  timezone: "list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)"
   log_level: "list(trace|debug|info|notice|warning|error|fatal)"
-  https_only: "bool"
+  https_only: bool
+
 environment:
   TRILIUM_DATA_DIR: "/home/node/trilium-data"
   TZ: "{{ options.timezone }}"
