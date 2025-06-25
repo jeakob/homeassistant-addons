@@ -1,4 +1,4 @@
-name: Update Dockerfile and Build Image
+name: Build and Push TriliumNext Docker Image
 
 on:
   push:
@@ -9,32 +9,40 @@ on:
       - main
 
 jobs:
-  update-dockerfile:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout your repository
         uses: actions/checkout@v3
 
-      - name: Clone TriliumNext upstream repo
+      - name: Clone upstream TriliumNext repo
         run: |
           git clone --depth=1 https://github.com/TriliumNext/Notes.git upstream
 
-      - name: Copy required files for build context
+      - name: Copy server files to build context
+        run: |
+          cp -r upstream/apps/server ./server
+
+      - name: Install dependencies and build Trilium frontend
+        working-directory: ./server
+        run: |
+          apk add --no-cache nodejs npm  # or use Node.js setup action
+          npm install -g pnpm
+          pnpm install
+          pnpm run build
+
+      - name: Copy start script
+        run: cp upstream/apps/server/start-docker.sh ./server/start-docker.sh && chmod +x ./server/start-docker.sh
+
+      - name: Prepare Dockerfile
         run: |
           cp upstream/apps/server/Dockerfile.alpine ./Dockerfile
-          cp upstream/apps/server/start-docker.sh ./start-docker.sh
-          chmod +x ./start-docker.sh
-          # Copy the entire docker folder that includes pnpm-workspace.yaml
-          cp -r upstream/apps/server/docker ./docker
-
-      - name: Update WORKDIR in Dockerfile to /data
-        run: |
           sed -i 's|^WORKDIR .*|WORKDIR /data|' Dockerfile
 
       - name: Build Docker image
         run: |
-          docker build -t jeakob/triliumnext:latest .
+          docker build -t jeakob/triliumnext:latest -f Dockerfile ./server
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
