@@ -1,12 +1,12 @@
-name: Update Dockerfile and Build Image
+name: Update Dockerfile, Build and Push Image
 
 on:
   push:
     branches:
-      - main  # Trigger on push to main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on PR to main branch
+      - main
 
 jobs:
   build-and-push:
@@ -18,27 +18,14 @@ jobs:
 
       - name: Fetch upstream Dockerfile and required files
         run: |
+          mkdir -p docker
           curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine
-          curl -o start-docker.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/start-docker.sh
-          curl -o pnpm-workspace.yaml https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/docker/pnpm-workspace.yaml
+          curl -o docker/start-docker.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/start-docker.sh
+          curl -o docker/pnpm-workspace.yaml https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/docker/pnpm-workspace.yaml
+          curl -o docker/package.json https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/docker/package.json
 
       - name: Update WORKDIR to /data in Dockerfile
         run: sed -i 's|^WORKDIR .*|WORKDIR /data|' Dockerfile
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-        working-directory: .
-
-      - name: Build Docker image
-        run: docker build -t jeakob/triliumnext:latest .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -46,5 +33,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build Docker image
+        run: docker build -t jeakob/trilium-next:latest .
+
       - name: Push Docker image to Docker Hub
-        run: docker push jeakob/triliumnext:latest
+        run: docker push jeakob/trilium-next:latest
