@@ -1,6 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
+# Load bashio helpers for config and logging
+source /usr/lib/bashio/helpers.sh
+
+echo "Starting TriliumNext Notes..."
 # Ensure data directory exists with proper permissions
 mkdir -p /home/node/trilium-data
 chown -R node:node /home/node/trilium-data
