@@ -3,12 +3,11 @@ set -e
 
 echo "Starting TriliumNext Notes..."
 
-TRILIUM_DATA_DIR="${TRILIUM_DATA_DIR:-/home/node/trilium-data}"
 EXPOSE_RAW_PORT="${EXPOSE_RAW_PORT:-false}"
 
-mkdir -p "$TRILIUM_DATA_DIR"
-chown -R node:node "$TRILIUM_DATA_DIR"
-chmod -R 755 "$TRILIUM_DATA_DIR"
+mkdir -p /home/node/trilium-data
+chown -R node:node /home/node/trilium-data
+chmod -R 755 /home/node/trilium-data
 
 APP_DIR="/usr/src/app"
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
