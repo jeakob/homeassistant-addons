@@ -54,12 +54,5 @@ schema:
 
 environment:
   TRILIUM_DATA_DIR: "/home/node/trilium-data"
-  TZ: "{{ options.timezone }}"
   NODE_ENV: "production"
   HOST: "0.0.0.0"
-  TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
-#  TRILIUM_LANGUAGE: "{{ options.language }}"
-  EXPOSE_RAW_PORT: "{{ options.EXPOSE_RAW_PORT }}"
-}
-
-upstream: v0.95.0
