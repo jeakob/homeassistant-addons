@@ -1,4 +1,3 @@
----
 name: "TriliumNext Notes"
 version: "v2025.03.12"
 slug: trilium_next
@@ -7,37 +6,95 @@ url: "https://github.com/triliumnext/trilium"
 ingress: true
 ingress_port: 8080
 ingress_stream: true
-panel_icon: mdi:notebook-multiple
-panel_title: Trilium Notes
+panel_icon: "mdi:notebook-multiple"
+panel_title: "Trilium Notes"
 webui: "http://[HOST]:[PORT:8080]/"
+
 arch:
   - amd64
   - aarch64
+
 startup: application
 boot: auto
 init: false
+
 map:
   - type: data
     read_only: false
     path: /home/node/trilium-data
-ports:
-  "8080/tcp": 8080
+
 options:
-# language: en
-  timezone: "Europe/Berlin"
-  log_level: "info"
-  https_only: false
+  NO_AUTHENTICATION:
+    description: "Disable authentication"
+    type: bool
+    default: true
+  TRILIUM_OAUTH_BASE_URL:
+    description: "OAuth base URL"
+    type: str
+    default: ""
+  TRILIUM_OAUTH_CLIENT_ID:
+    description: "OAuth client ID"
+    type: str
+    default: ""
+  TRILIUM_OAUTH_CLIENT_SECRET:
+    description: "OAuth client secret"
+    type: str
+    default: ""
+  TRILIUM_OAUTH_ISSUER_BASE_URL:
+    description: "OAuth issuer base URL"
+    type: str
+    default: ""
+  TRILIUM_OAUTH_ISSUER_NAME:
+    description: "OAuth issuer name"
+    type: str
+    default: ""
+
+expose:
+  "8080/tcp": {}
+
+ports_description:
+  "8080/tcp": "Web interface"
+
 schema:
-#  language: |
-#    list(ar|br|ca|cs|de|en|eo|es|fa|fr|hi|it|ja|ko|kz|nl|pl|pt|ru|sv|tl|tr|uk|uz|vi|zh)
-  timezone: |
-    list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
-  log_level: "list(trace|debug|info|notice|warning|error|fatal)"
-  https_only: "bool"
+  NO_AUTHENTICATION: bool
+  TRILIUM_OAUTH_BASE_URL: str
+  TRILIUM_OAUTH_CLIENT_ID: str
+  TRILIUM_OAUTH_CLIENT_SECRET: str
+  TRILIUM_OAUTH_ISSUER_BASE_URL: str
+  TRILIUM_OAUTH_ISSUER_NAME: str
+
+timezone: >
+  list(
+    Europe/Berlin |
+    America/New_York |
+    UTC |
+    Asia/Berlin |
+    Europe/London |
+    Asia/Tokyo |
+    Australia/Sydney
+  )
+
+log_level:
+  description: "Log level"
+  type: list
+  options:
+    - trace
+    - debug
+    - info
+    - notice
+    - warning
+    - error
+    - fatal
+  default: info
+
+https_only:
+  description: "Require HTTPS"
+  type: bool
+  default: false
+
 environment:
   TRILIUM_DATA_DIR: "/home/node/trilium-data"
   TZ: "{{ options.timezone }}"
-  NODE_ENV: "production" 
+  NODE_ENV: "production"
   HOST: "0.0.0.0"
   TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
-#  TRILIUM_LANGUAGE: "{{ options.language }}"
