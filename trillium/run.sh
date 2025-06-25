@@ -1,27 +1,20 @@
 #!/bin/bash
 set -e
 
-# Load bashio helpers for config and logging
-source /usr/lib/bashio/helpers.sh
-
 echo "Starting TriliumNext Notes..."
-# Ensure data directory exists with proper permissions
-mkdir -p /home/node/trilium-data
-chown -R node:node /home/node/trilium-data
-chmod -R 755 /home/node/trilium-data
 
-echo "Starting TriliumNext Notes..."
+TRILIUM_DATA_DIR="${TRILIUM_DATA_DIR:-/home/node/trilium-data}"
+EXPOSE_RAW_PORT="${EXPOSE_RAW_PORT:-false}"
+
+mkdir -p "$TRILIUM_DATA_DIR"
+chown -R node:node "$TRILIUM_DATA_DIR"
+chmod -R 755 "$TRILIUM_DATA_DIR"
 
 APP_DIR="/usr/src/app"
-
-# Important for Home Assistant Ingress
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
 export TRILIUM_ROOT_PATH="${TRILIUM_BASE_URL}"
 
 cd "$APP_DIR"
-
-# Read config option EXPOSE_RAW_PORT from Home Assistant addon config
-EXPOSE_RAW_PORT=$(bashio::config 'EXPOSE_RAW_PORT')
 
 if [ "$EXPOSE_RAW_PORT" = "true" ]; then
   echo "Starting Trilium with raw port exposed on 0.0.0.0:8080"
