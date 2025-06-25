@@ -1,11 +1,16 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
+# Set shell
+SHELL ["/bin/sh", "-c"]
+
 # Install necessary tools
 RUN apt-get update && apt-get install -y bash socat wget && rm -rf /var/lib/apt/lists/*
 
-# Use bash shell
-SHELL ["/bin/bash", "-c"]
+# Copy data for add-on
+COPY run.sh /
+RUN chmod a+x /run.sh
+
 
 # Copy addon startup script
 COPY run.sh /
