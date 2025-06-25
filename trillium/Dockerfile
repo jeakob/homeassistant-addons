@@ -1,6 +1,4 @@
 ARG BUILD_FROM
-ARG BUILD_VERSION=unknown
-
 FROM ${BUILD_FROM}
 
 # Install necessary tools
