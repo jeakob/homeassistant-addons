@@ -9,14 +9,22 @@ chmod -R 755 /home/node/trilium-data
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
 
-# Use the known app path
+# Application directory
 APP_DIR="/usr/src/app"
 
-# Important for Home Assistant Ingress
+# Home Assistant Ingress path
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
 export TRILIUM_ROOT_PATH="${TRILIUM_BASE_URL}"
 
-# Change to app directory and start with proper host binding
+# Optional debug logs (disable in production)
+echo "TRILIUM_OAUTH_BASE_URL: $TRILIUM_OAUTH_BASE_URL"
+echo "TRILIUM_OAUTH_CLIENT_ID: $TRILIUM_OAUTH_CLIENT_ID"
+echo "TRILIUM_OAUTH_ISSUER_BASE_URL: $TRILIUM_OAUTH_ISSUER_BASE_URL"
+echo "TRILIUM_OAUTH_ISSUER_NAME: $TRILIUM_OAUTH_ISSUER_NAME"
+
+# Move to application directory
 cd "$APP_DIR"
-echo "Starting TriliumNext Notes with ingress configuration..."
-exec su -s /bin/sh -c "node src/main --host 0.0.0.0 --port 8080" node
+
+# Start Trilium as the node user with environment variables preserved
+echo "Starting TriliumNext Notes with ingress and OIDC configuration..."
+exec su -s /bin/sh node -c 'env node src/main --host 0.0.0.0 --port 8080'
