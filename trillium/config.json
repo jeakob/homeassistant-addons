@@ -1,0 +1,41 @@
+{
+  "name": "TriliumNext Notes",
+  "version": "v2025.03.12",
+  "slug": "trilium_next",
+  "description": "Hierarchical note-taking application with encryption, Markdown support, and personal knowledge base features",
+  "url": "https://github.com/triliumnext/trilium",
+  "ingress": true,
+  "ingress_port": 8080,
+  "ingress_stream": true,
+  "panel_icon": "mdi:notebook-multiple",
+  "panel_title": "Trilium Notes",
+  "arch": [
+    "amd64",
+    "aarch64"
+  ],
+  "startup": "application",
+  "boot": "auto",
+  "init": false,
+  "map": [
+    "/home/trilium/trilium-data"
+  ],
+  "ports": {},
+  "options": {
+    "timezone": "Europe/Berlin",
+    "log_level": "info",
+    "https_only": false
+  },
+  "schema": {
+    "timezone": "list(Europe/Berlin|America/New_York|UTC|Europe/London|Asia/Tokyo|Australia/Sydney)",
+    "log_level": "list(trace|debug|info|notice|warning|error|fatal)",
+    "https_only": "bool"
+  },
+  "environment": {
+    "TRILIUM_DATA_DIR": "/home/trilium/trilium-data",
+    "TZ": "{{ options.timezone }}",
+    "NODE_ENV": "production",
+    "HOST": "0.0.0.0",
+    "PORT": "8080",
+    "TRILIUM_LOG_LEVEL": "{{ options.log_level }}"
+  }
+}
