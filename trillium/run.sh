@@ -14,7 +14,8 @@ APP_DIR="/usr/src/app"
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
 export TRILIUM_ROOT_PATH="${TRILIUM_BASE_URL}"
 
-cd "$APP_DIR"
+# Use the known app path
+APP_DIR="/usr/src/app"
 
 if [ "$EXPOSE_RAW_PORT" = "true" ]; then
   echo "Starting Trilium with raw port exposed on 0.0.0.0:8080"
