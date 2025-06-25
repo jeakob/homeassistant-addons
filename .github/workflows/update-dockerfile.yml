@@ -18,11 +18,12 @@ jobs:
 
       - name: Fetch upstream Dockerfile and required files
         run: |
-          mkdir -p docker
           curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine
-          curl -o docker/start-docker.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/start-docker.sh
+          curl -o start-docker.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/start-docker.sh
+          mkdir -p docker
           curl -o docker/pnpm-workspace.yaml https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/docker/pnpm-workspace.yaml
           curl -o docker/package.json https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/docker/package.json
+
 
       - name: Update WORKDIR to /data in Dockerfile
         run: sed -i 's|^WORKDIR .*|WORKDIR /data|' Dockerfile
