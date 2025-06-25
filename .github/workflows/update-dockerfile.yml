@@ -1,0 +1,34 @@
+name: Update Dockerfile and Build Image
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+  pull_request:
+    branches:
+      - main  # Trigger on PR to main branch
+
+jobs:
+  update-dockerfile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch upstream Dockerfile
+        run: |
+          curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine
+
+      - name: Update WORKDIR to /data
+        run: |
+          sed -i 's|^WORKDIR .*|WORKDIR /data|' Dockerfile
+
+      - name: Build Docker image
+        run: |
+          docker build -t your-image-name:latest .
+
+      - name: Push Docker image
+        run: |
+          docker tag your-image-name:latest your-dockerhub-username/your-image-name:latest
+          docker push your-dockerhub-username/your-image-name:latest
