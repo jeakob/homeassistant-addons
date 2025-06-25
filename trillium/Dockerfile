@@ -11,11 +11,6 @@ RUN apt-get update && apt-get install -y bash socat wget && rm -rf /var/lib/apt/
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-
-# Copy addon startup script
-COPY run.sh /
-RUN chmod a+x /run.sh
-
 # Home Assistant metadata
 LABEL \
     io.hass.name="TriliumNext Notes" \
