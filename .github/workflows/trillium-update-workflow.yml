@@ -1,4 +1,4 @@
-name: TrilliumNext Update Upstream Version
+name: Trillium Update Upstream Version
 
 on:
   workflow_dispatch:
