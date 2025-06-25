@@ -3,17 +3,20 @@ ARG BUILD_VERSION=unknown
 
 FROM ${BUILD_FROM}
 
-# Copy addon startup script and make executable
+# Install necessary tools
+RUN apt-get update && apt-get install -y bash socat wget && rm -rf /var/lib/apt/lists/*
+
+# Use bash shell
+SHELL ["/bin/bash", "-c"]
+
+# Copy addon startup script
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-# Install socat and wget (needed for healthcheck)
-RUN apt-get update && apt-get install -y bash socat wget && rm -rf /var/lib/apt/lists/*
+# Copy the Trilium source code
+COPY trilium/ /usr/src/app/
 
-# Use sh shell
-SHELL ["/bin/bash", "-c"]
-
-# Home Assistant labels for metadata
+# Home Assistant metadata
 LABEL \
     io.hass.name="TriliumNext Notes" \
     io.hass.description="Hierarchical note-taking application" \
@@ -21,12 +24,10 @@ LABEL \
     io.hass.type="addon" \
     io.hass.arch="${BUILD_ARCH}"
 
-# Expose port 8080 (for raw access, if enabled)
+# Expose the port
 EXPOSE 8080
 
-# Healthcheck endpoint to verify app is running
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
   CMD wget --quiet --tries=1 --spider http://localhost:8080/ || exit 1
 
-# Run your custom entrypoint script
 ENTRYPOINT ["/run.sh"]
