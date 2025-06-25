@@ -4,14 +4,11 @@ FROM ${BUILD_FROM}
 # Set shell
 SHELL ["/bin/sh", "-c"]
 
-# Install necessary tools
-RUN apt-get update && apt-get install -y bash socat wget && rm -rf /var/lib/apt/lists/*
-
 # Copy data for add-on
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-# Home Assistant metadata
+# Home Assistant requires these labels
 LABEL \
     io.hass.name="TriliumNext Notes" \
     io.hass.description="Hierarchical note-taking application" \
@@ -21,8 +18,8 @@ LABEL \
 
 # Expose the port
 EXPOSE 8080
-
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
   CMD wget --quiet --tries=1 --spider http://localhost:8080/ || exit 1
 
+# Set entrypoint
 ENTRYPOINT ["/run.sh"]
