@@ -1,55 +1,36 @@
----
-name: "TriliumNext Notes"
-version: "v0.95.0"
-slug: trilium_next
-description: "Hierarchical note-taking application with encryption, Markdown support, and personal knowledge base features"
-url: "https://github.com/triliumnext/trilium"
-ingress: true
-ingress_port: 8080
-ingress_stream: true
-panel_icon: mdi:notebook-multiple
-panel_title: Trilium Notes
-webui: "http://[HOST]:[PORT:8080]/"
-arch:
-  - amd64
-  - aarch64
-startup: application
-boot: auto
-init: false
-map:
-  - type: data
-    read_only: false
-    path: /home/node/trilium-data
-ports:
-  "8080/tcp": 8080
-options:
-  timezone: "Europe/Berlin"
-  log_level: "info"
-  https_only: false
-  tril_oauth_base_url: ""
-  tril_oauth_client_id: ""
-  tril_oauth_client_secret: ""
-  tril_oauth_issuer_base_url: ""
-  tril_oauth_issuer_name: ""
-schema:
-  timezone: |
-    list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
-  log_level: "list(trace|debug|info|notice|warning|error|fatal)"
-  https_only: "bool"
-  tril_oauth_base_url: "str?"
-  tril_oauth_client_id: "str?"
-  tril_oauth_client_secret: "str?"
-  tril_oauth_issuer_base_url: "str?"
-  tril_oauth_issuer_name: "str?"
-  
-environment:
-  TRILIUM_DATA_DIR: "/home/node/trilium-data"
-  TZ: "{{ options.timezone }}"
-  NODE_ENV: "production"
-  HOST: "0.0.0.0"
-  TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
-  TRILIUM_OAUTH_BASE_URL: "{{ options.tril_oauth_base_url }}"
-  TRILIUM_OAUTH_CLIENT_ID: "{{ options.tril_oauth_client_id }}"
-  TRILIUM_OAUTH_CLIENT_SECRET: "{{ options.tril_oauth_client_secret }}"
-  TRILIUM_OAUTH_ISSUER_BASE_URL: "{{ options.tril_oauth_issuer_base_url }}"
-  TRILIUM_OAUTH_ISSUER_NAME: "{{ options.tril_oauth_issuer_name }}"
+{
+  "arch": [
+    "amd64",
+    "aarch64",
+    "armhf",
+    "armv7",
+    "i386"
+  ],
+  "boot": "auto",
+  "description": "TriliumNext Notes is a hierarchical note taking application with focus on building large personal knowledge bases.",
+  "environment": {
+    "TRILIUM_DATA_DIR": "/config",
+    "NO_AUTHENTICATION": "true"
+  },
+  "name": "Trilium Next - JB",
+  "map": [
+    "addon_config:rw"
+  ],
+  "options": {},
+  "expose": {
+    "8080/tcp": {}
+  },
+  "ports_description": {
+    "8080/tcp": "Web interface"
+  },
+  "schema": {},
+  "slug": "triliumnext",
+  "startup": "services",
+  "upstream": "v0.95.0",
+  "url": "https://github.com/jeakob/homeassistant-addons",
+  "version": "v0.95.0",
+  "ingress": true,
+  "ingress_port": 8080,
+  "image": "triliumnext/notes",
+  "webui": "[PROTO:ssl]://[HOST]:[PORT:8080]"
+}
