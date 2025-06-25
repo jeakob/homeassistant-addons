@@ -3,15 +3,15 @@ ARG BUILD_VERSION=unknown
 
 FROM ${BUILD_FROM}
 
-# Use sh shell
-SHELL ["/bin/bash", "-c"]
-
 # Copy addon startup script and make executable
 COPY run.sh /
 RUN chmod a+x /run.sh
 
 # Install socat and wget (needed for healthcheck)
 RUN apt-get update && apt-get install -y bash socat wget && rm -rf /var/lib/apt/lists/*
+
+# Use sh shell
+SHELL ["/bin/bash", "-c"]
 
 # Home Assistant labels for metadata
 LABEL \
