@@ -1,6 +1,6 @@
 {
   "arch": [
-    "amd64",
+    "amd64",More actions
     "aarch64",
     "armhf",
     "armv7",
@@ -9,17 +9,12 @@
   "boot": "auto",
   "description": "TriliumNext Notes is a hierarchical note taking application with focus on building large personal knowledge bases.",
   "environment": {
-    "TRILIUM_DATA_DIR": "/share/trilium",
-    "NO_AUTHENTICATION": "NO_AUTHENTICATION",
-    "TRILIUM_OAUTH_BASE_URL": "TRILIUM_OAUTH_BASE_URL",
-    "TRILIUM_OAUTH_CLIENT_ID": "TRILIUM_OAUTH_CLIENT_ID",
-    "TRILIUM_OAUTH_CLIENT_SECRET": "TRILIUM_OAUTH_CLIENT_SECRET",
-    "TRILIUM_OAUTH_ISSUER_BASE_URL": "TRILIUM_OAUTH_ISSUER_BASE_URL",
-    "TRILIUM_OAUTH_ISSUER_NAME": "TRILIUM_OAUTH_ISSUER_NAME"
+    "TRILIUM_DATA_DIR": "/config",
+    "NO_AUTHENTICATION": "true"
   },
   "name": "Trilium Next - JB",
   "map": [
-    "share:rw"
+    "addon_config:rw"
   ],
   "options": {
     "NO_AUTHENTICATION": true,
@@ -29,6 +24,12 @@
     "TRILIUM_OAUTH_ISSUER_BASE_URL": "",
     "TRILIUM_OAUTH_ISSUER_NAME": ""
   },
+  "expose": {
+    "8080/tcp": {}
+  },
+  "ports_description": {
+    "8080/tcp": "Web interface"
+  },
   "schema": {
     "NO_AUTHENTICATION": "bool",
     "TRILIUM_OAUTH_BASE_URL": "str",
@@ -36,12 +37,6 @@
     "TRILIUM_OAUTH_CLIENT_SECRET": "str",
     "TRILIUM_OAUTH_ISSUER_BASE_URL": "str",
     "TRILIUM_OAUTH_ISSUER_NAME": "str"
-  },
-  "expose": {
-    "8080/tcp": {}
-  },
-  "ports_description": {
-    "8080/tcp": "Web interface"
   },
   "slug": "triliumnext",
   "startup": "services",
@@ -51,6 +46,5 @@
   "ingress": true,
   "ingress_port": 8080,
   "image": "triliumnext/notes",
-  "webui": "[PROTO:ssl]://[HOST]:[PORT:8080]",
-  "tmpfs": "size=100m,uid=1000,gid=1000"
+  "webui": "[PROTO:ssl]://[HOST]:[PORT:8080]"
 }
