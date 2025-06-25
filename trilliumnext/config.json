@@ -19,8 +19,11 @@
   },
   "name": "Trilium Next - JB",
   "map": [
-    "share:rw"
+    "media:rw"
   ],
+  "init": false,
+  "privileged": ["SYS_ADMIN"],
+  "full_access": false,
   "options": {
     "NO_AUTHENTICATION": true,
     "TRILIUM_OAUTH_BASE_URL": "",
