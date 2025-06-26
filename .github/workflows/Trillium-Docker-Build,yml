@@ -1,8 +1,10 @@
 name: Build and Push TriliumNext Rootless Add-on
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+    - cron: '0 6 * * *' # every day at 6:00 UTC
+
 
 jobs:
   build:
