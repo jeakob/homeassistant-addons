@@ -25,4 +25,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: <your-dockerhub-username>/triliumnext-notes:latest
+          tags: jeakob/triliumnext-notes:latest
