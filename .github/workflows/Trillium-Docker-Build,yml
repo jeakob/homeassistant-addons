@@ -1,0 +1,32 @@
+name: Build and Push TriliumNext Rootless Add-on
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download rootless Dockerfile
+        run: curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine.rootless
+
+      - name: Patch Dockerfile for Home Assistant add-on
+        run: |
+          sed -i 's|/home/trilium-data|/data|g' Dockerfile
+          # Ensure TRILIUM_DATA_DIR is set to /data
+          grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: jeakob/triliumnext-notes:latest
