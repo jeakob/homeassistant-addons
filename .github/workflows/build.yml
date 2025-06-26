@@ -18,6 +18,9 @@ jobs:
       - name: Download rootless Dockerfile
         run: curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine.rootless
 
+      - name: Download rootless entrypoint script
+        run: curl -o rootless-entrypoint.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/rootless-entrypoint.sh
+
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
           sed -i 's|/home/trilium-data|/data|g' Dockerfile
