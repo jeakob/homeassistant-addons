@@ -26,6 +26,8 @@ jobs:
           sed -i 's|/home/trilium-data|/data|g' Dockerfile
           # Ensure TRILIUM_DATA_DIR is set to /data
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
+          # Remove COPY ./dist line to avoid build error
+          sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
