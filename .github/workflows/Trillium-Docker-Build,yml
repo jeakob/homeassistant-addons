@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch: {}
   schedule:
     - cron: '0 0 * * *'
 
@@ -21,7 +21,6 @@ jobs:
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
           sed -i 's|/home/trilium-data|/data|g' Dockerfile
-          # Ensure TRILIUM_DATA_DIR is set to /data
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
 
       - name: Build and push Docker image
