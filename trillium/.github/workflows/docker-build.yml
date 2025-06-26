@@ -2,7 +2,11 @@ name: Build and Push TriliumNext Rootless Add-on
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   build:
