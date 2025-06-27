@@ -13,10 +13,13 @@ RUN if ! command -v node > /dev/null 2>&1; then \
 RUN addgroup -g 1000 node 2>/dev/null || true && \
     adduser -D -s /bin/sh -u 1000 -G node node 2>/dev/null || true
 
-# Create necessary directories and set permissions
-RUN mkdir -p /config/tmp /config/log /data/tmp /data/log /home/node/trilium-data && \
-    chown -R 1000:1000 /config /data /home/node && \
-    chmod -R 755 /config /data /home/node
+# Create necessary directories and set permissions (focus on /data only)
+RUN mkdir -p /data/tmp /data/log /data/trilium-data && \
+    chown -R 1000:1000 /data && \
+    chmod -R 755 /data
+
+# Add volume declaration
+VOLUME ["/data"]
 
 # Copy data for add-on
 COPY run.sh /
