@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Get latest release metadata from trilliumnext/notes
+      - name: Get latest release metadata from triliumnext/trilium
         id: get_release
         uses: actions/github-script@v7
         with:
