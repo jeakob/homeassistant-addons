@@ -26,23 +26,25 @@ export TMPDIR="/data/tmp"
 export TEMP="/data/tmp"
 
 # Debug: Show directory permissions
-echo "Directory permissions:"
-ls -la /config/
+echo "Directory permissions for /data:"
+ls -la /data
+
+# Debug: Show Node user info
 echo "Node user info:"
 id node 2>/dev/null || echo "Node user not found"
+
+# Show current user and process UID/GID
 echo "Current user: $(whoami)"
 echo "Process will run as UID: ${USER_UID}, GID: ${USER_GID}"
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
-
-# Use the known app path
-APP_DIR="/usr/src/app"
 
 # Important for Home Assistant Ingress
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
 export TRILIUM_ROOT_PATH="${TRILIUM_BASE_URL}"
 
 # Change to app directory
+APP_DIR="/usr/src/app"
 cd "$APP_DIR"
 
 echo "Starting TriliumNext Notes with ingress configuration..."
