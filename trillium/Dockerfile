@@ -37,11 +37,13 @@ LABEL \
 # Add argument for optional port exposure
 ARG EXPOSE_PORT=true
 
-# Check if we should expose the port
+# Default behavior: expose the port 8080 if EXPOSE_PORT is true
 RUN if [ "$EXPOSE_PORT" = "true" ]; then \
+        echo "Exposing port 8080"; \
         EXPOSE 8080; \
+    else \
+        echo "Not exposing port 8080"; \
     fi
-
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
