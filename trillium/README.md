@@ -1,6 +1,7 @@
 <img src="trill.png" width="100" height="100">
 
-# TriliumNext Notes for Home Assistant
+# TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER
+
 
 ## About
 
