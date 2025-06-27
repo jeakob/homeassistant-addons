@@ -21,7 +21,7 @@ jobs:
     - name: Parse version from build.yml
       id: parse_version
       run: |
-        VERSION=$(grep 'version:' build.yml | awk '{print $2}')
+        VERSION=$(grep 'version:' ./trillium/build.yml | awk '{print $2}')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "Version extracted: $VERSION"
 
