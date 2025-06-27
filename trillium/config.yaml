@@ -1,6 +1,6 @@
 ---
 name: "TriliumNext Notes"
-version: "v0.94.0"
+version: "v0.95.0"
 slug: trilium_next
 description: "Hierarchical note-taking application with encryption, Markdown support, and personal knowledge base features"
 url: "https://github.com/triliumnext/trilium"
