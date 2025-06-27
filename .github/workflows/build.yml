@@ -42,7 +42,7 @@ jobs:
           sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
 
           # Fix COPY for package.json to point to correct path
-          sed -i 's|COPY\s\+\./docker/package.json.*|COPY ./trillium/package.json /usr/src/app/|' Dockerfile
+          sed -i 's|COPY\s\+\./docker/package.json.*|COPY ./package.json /usr/src/app/|' Dockerfile
 
       - name: List repo root after patching Dockerfile
         run: ls -la
@@ -73,10 +73,3 @@ jobs:
         run: ls -la trillium
 
       - name: Commit and push if changed
-        if: steps.move_and_check.outputs.changed == '1'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add trillium/Dockerfile trillium/rootless-entrypoint.sh trillium/package.json
-          git commit -m "Update patched Dockerfile, entrypoint, and package.json"
-          git push
