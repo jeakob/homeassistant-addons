@@ -15,10 +15,10 @@ chown -R node:node /config
 chown -R node:node /config/log
 chown -R node:node /config/tmp
 
-chown -R node:node /config
-chmod -R u+w /config
 mkdir -p /config/tmp /config/log
-chown -R node:node /config/tmp /config/log
+chown -R ${USER}:${USER} /config/tmp /config/log
+chmod -R u+rwX /config/tmp /config/log
+
 
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
