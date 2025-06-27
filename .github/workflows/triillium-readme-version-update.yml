@@ -1,9 +1,15 @@
+# .github/workflows/update-readme.yml
+
 name: Update README with Version
 
 on:
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  
+  # Runs on a schedule
   schedule:
-    - cron: '1 * * * *' # every day at 6:00 UTC
+    # This runs at 06:00 UTC every day.
+    - cron: '0 6 * * *'
 
 jobs:
   update-readme:
@@ -11,40 +17,58 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
-      
-    - name: List current directory and files
+      uses: actions/checkout@v4
+
+    - name: List files for debugging
       run: |
-        echo "Current directory:"
-        pwd  # Print current directory
-        echo "Contents of the current directory:"
-        ls -alh  # List all files with detailed information
+        echo "Current directory: $(pwd)"
+        echo "Contents of 'trillium' directory:"
+        ls -al trillium/
 
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
-    - name: Parse version from build.yml
+    - name: Parse version from build.yaml
       id: parse_version
       run: |
-        VERSION=$(grep 'version:' /home/runner/work/homeassistant-addons/homeassistant-addons/trillium/build.yaml | awk '{print $2}')
+        # This command finds the line with 'amd64:', splits it by the ':' delimiter,
+        # takes the third part (the version string), and trims any whitespace.
+        # We use a relative path which is more robust.
+        VERSION=$(grep 'amd64:' trillium/build.yaml | awk -F ':' '{print $3}' | xargs)
+        
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "Version extracted: $VERSION"
 
     - name: Update README.md with version
+      # This step only runs if a version was successfully extracted
+      if: env.VERSION
       run: |
-        VERSION="${{ env.VERSION }}"
-        
-        # Replace the VERSION_PLACEHOLDER in the header
-        sed -i "s/# TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER/# TriliumNext Notes for Home Assistant Version: ${VERSION}/g" README.md
+        # The placeholder in your README that will be replaced.
+        # Example: # TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER
+        PLACEHOLDER="VERSION_PLACEHOLDER"
+
+        # Use sed to find and replace the placeholder with the actual version.
+        # The use of a different delimiter for sed (#) avoids conflicts if the version contains slashes.
+        sed -i "s#${PLACEHOLDER}#${{ env.VERSION }}#g" README.md
+        echo "README.md updated."
+
 
     - name: Commit changes
+      # This step only runs if a version was extracted and the README file was modified.
+      if: env.VERSION
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # Commit and push changes to README.md
-        git add README.md
-        git commit -m "Update README with version ${VERSION}"
-        git push
+        # Check if there are changes to commit
+        if ! git diff --quiet README.md; then
+          echo "Changes detected in README.md. Committing..."
+          git add README.md
+          # Use the env context to access the version variable in the commit message
+          git commit -m "Docs: Update README with version ${{ env.VERSION }}"
+          git push
+        else
+          echo "No changes to commit."
+        fi
