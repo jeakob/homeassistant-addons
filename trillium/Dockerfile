@@ -34,7 +34,14 @@ LABEL \
     io.hass.arch="${BUILD_ARCH}"
 
 # Expose the port
-EXPOSE 8080
+# Add argument for optional port exposure
+ARG EXPOSE_PORT=true
+
+# Check if we should expose the port
+RUN if [ "$EXPOSE_PORT" = "true" ]; then \
+        EXPOSE 8080; \
+    fi
+
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
