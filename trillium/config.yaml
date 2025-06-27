@@ -19,29 +19,25 @@ init: false
 map:
   - type: data
     read_only: false
-    path: /home/node/trilium-data
+    path: /data/trilium-data  # This needs to point to /data, where you have your persistent storage
 ports:
   "8080/tcp": 8080
 options:
-# language: en
   timezone: "Europe/Berlin"
   log_level: "info"
   https_only: false
 schema:
-#  language: |
-#    list(ar|br|ca|cs|de|en|eo|es|fa|fr|hi|it|ja|ko|kz|nl|pl|pt|ru|sv|tl|tr|uk|uz|vi|zh)
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
   log_level: "list(trace|debug|info|notice|warning|error|fatal)"
   https_only: "bool"
 environment:
-  TRILIUM_DATA_DIR: "/home/node/trilium-data"
+  TRILIUM_DATA_DIR: "/data/trilium-data"  # Use /data for persistent data storage
   USER_UID: "1000"
   USER_GID: "1000"
-  TMPDIR: "/data/tmp"
-  TEMP: "/data/tmp"
+  TMPDIR: "/data/tmp"  # Use /data/tmp for temporary storage
+  TEMP: "/data/tmp"  # Same as TMPDIR
   TZ: "{{ options.timezone }}"
-  NODE_ENV: "production" 
+  NODE_ENV: "production"
   HOST: "0.0.0.0"
   TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
-#  TRILIUM_LANGUAGE: "{{ options.language }}"
