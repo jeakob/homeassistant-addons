@@ -5,12 +5,15 @@ set -e
 mkdir -p /home/node/trilium-data
 mkdir -p /config
 mkdir -p /config/log
+mkdir -p /config/tmp
 chown -R node:node /home/node/trilium-data
 chmod -R 755 /home/node/trilium-data
 chmod -R 755 /config
 chmod -R 755 /config/log
+chmod -R 755 /config/tmp
 chown -R node:node /config
 chown -R node:node /config/log
+chown -R node:node /config/tmp
 
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
