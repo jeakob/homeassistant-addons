@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - build.yml  # Trigger workflow only when build.yml is modified
+  schedule:
+    - cron: '*/5 * * * *'  # Runs every 5 minutes
 
 jobs:
   update-readme:
