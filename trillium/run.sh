@@ -1,30 +1,31 @@
 #!/bin/sh
 set -e
 
-# Ensure data directory exists with proper permissions
-mkdir -p /data/tmp /data/log
-rm -rf /config/tmp /config/log
-ln -s /data/tmp /config/tmp
-ln -s /data/log /config/log
+echo "Setting up TriliumNext Notes..."
 
-mkdir -p /home/node/trilium-data
-mkdir -p /config
-mkdir -p /config/log
-mkdir -p /config/tmp
-chown -R node:node /home/node/trilium-data
-chmod -R 755 /home/node/trilium-data
-chmod -R 755 /config
-chmod -R 755 /config/log
-chmod -R 755 /config/tmp
-chown -R node:node /config
-chown -R node:node /config/log
-chown -R node:node /config/tmp
+# Set default user/group if not specified
+USER_UID=${USER_UID:-1000}
+USER_GID=${USER_GID:-1000}
 
-mkdir -p /config/tmp /config/log
-chown -R ${USER}:${USER} /config/tmp /config/log
-chmod -R u+rwX /config/tmp /config/log
+# Ensure the node user exists with correct UID/GID
+if ! id node >/dev/null 2>&1; then
+    addgroup -g ${USER_GID} node 2>/dev/null || true
+    adduser -D -s /bin/sh -u ${USER_UID} -G node node 2>/dev/null || true
+fi
 
+# Create necessary directories
+mkdir -p /data/tmp /data/log /home/node/trilium-data /config
 
+# Remove any existing symlinks and recreate them
+rm -rf /config/tmp /config/log 2>/dev/null || true
+ln -sf /data/tmp /config/tmp
+ln -sf /data/log /config/log
+
+# Set ownership and permissions for all directories
+chown -R ${USER_UID}:${USER_GID} /data /home/node/trilium-data /config
+chmod -R 755 /data /home/node/trilium-data /config
+
+echo "Directory setup complete"
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
 
@@ -35,7 +36,11 @@ APP_DIR="/usr/src/app"
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
 export TRILIUM_ROOT_PATH="${TRILIUM_BASE_URL}"
 
-# Change to app directory and start with proper host binding
+# Change to app directory
 cd "$APP_DIR"
+
 echo "Starting TriliumNext Notes with ingress configuration..."
-exec su -s /bin/sh -c "node src/main --host 0.0.0.0 --port 8080" node
+echo "Running as user: $(id ${USER_UID} 2>/dev/null || echo "UID ${USER_UID}")"
+
+# Start the application as the node user
+exec su-exec ${USER_UID}:${USER_GID} node src/main --host 0.0.0.0 --port 8080
