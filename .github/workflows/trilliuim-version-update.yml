@@ -12,6 +12,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Install yq
+        run: sudo apt-get update && sudo apt-get install -y yq
+
       - name: Get latest release metadata from triliumnext/notes
         id: get_release
         uses: actions/github-script@v7
@@ -59,3 +62,10 @@ jobs:
 
             # Commit and push changes
             git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.yaml" "$ADDON_DIR/build.yaml" "$ADDON_DIR/CHANGELOG.md"
+            git commit -m "Update to upstream version $LATEST_VERSION"
+            git push
+          else
+            echo "No update needed"
+          fi
