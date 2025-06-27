@@ -1,0 +1,61 @@
+name: Trillium Update Upstream Version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *' # every day at 6:00 UTC
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get latest release metadata from triliumnext/notes
+        id: get_release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const res = await github.rest.repos.getLatestRelease({
+              owner: 'triliumnext',
+              repo: 'notes'
+            });
+            core.setOutput("tag", res.data.tag_name);
+            core.setOutput("body", res.data.body);
+
+      - name: Save changelog to file
+        run: echo "${{ steps.get_release.outputs.body }}" > changelog.txt
+
+      - name: List trillium folder content (debug)
+        run: ls -l ./trillium
+
+      - name: Check & update version files
+        env:
+          LATEST_VERSION: ${{ steps.get_release.outputs.tag }}
+        run: |
+          ADDON_DIR="./trillium"
+          CURRENT_VERSION=$(yq '.version' "$ADDON_DIR/config.yaml")
+
+          echo "Current: $CURRENT_VERSION | Latest: $LATEST_VERSION"
+
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "Updating files to version $LATEST_VERSION"
+
+            TODAY=$(date +'%d-%m-%Y')
+
+            # Update updater.json
+            jq --arg v "$LATEST_VERSION" --arg d "$TODAY" \
+              '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp && mv tmp "$ADDON_DIR/updater.json"
+
+            # Update config.yaml version
+            yq e -i ".version = \"$LATEST_VERSION\"" "$ADDON_DIR/config.yaml"
+
+            # Update build.yaml image versions
+            sed -i "s|docker.io/triliumnext/notes:.*|docker.io/triliumnext/notes:$LATEST_VERSION|g" "$ADDON_DIR/build.yaml"
+
+            # Overwrite main changelog file with latest changelog
+            cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
+
+            # Commit and push changes
+            git config user.name "github-actions[bot]"
