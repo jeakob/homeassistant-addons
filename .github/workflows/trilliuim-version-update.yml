@@ -51,8 +51,8 @@ jobs:
             jq --arg v "$LATEST_VERSION" --arg d "$TODAY" \
               '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp && mv tmp "$ADDON_DIR/updater.json"
 
-            # Update config.yaml version
-            yq e -i ".version = \"$LATEST_VERSION\"" "$ADDON_DIR/config.yaml"
+            # Update config.yaml version (fixed with -y for YAML output)
+            yq e -i -y ".version = \"$LATEST_VERSION\"" "$ADDON_DIR/config.yaml"
 
             # Update build.yaml image versions
             sed -i "s|docker.io/triliumnext/notes:.*|docker.io/triliumnext/notes:$LATEST_VERSION|g" "$ADDON_DIR/build.yaml"
