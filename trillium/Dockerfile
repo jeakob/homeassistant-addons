@@ -4,8 +4,12 @@ FROM ${BUILD_FROM}
 # Set shell
 SHELL ["/bin/sh", "-c"]
 
-# Install gosu instead of su-exec
-RUN apk update && apk add --no-cache gosu
+# Manually download and install su-exec
+RUN apk update && \
+    apk add --no-cache curl && \
+    curl -L -o /bin/su-exec https://github.com/ncopa/su-exec/releases/download/v0.2/su-exec-0.2-linux-x86_64 && \
+    chmod +x /bin/su-exec
+
 
 # Install Node.js and npm if not already present in base image
 RUN if ! command -v node > /dev/null 2>&1; then \
