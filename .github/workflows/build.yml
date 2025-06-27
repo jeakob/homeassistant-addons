@@ -39,15 +39,14 @@ jobs:
       - name: Check for changes and move files
         id: move_and_check
         run: |
-          # Use consistent path here: your repo folder is homeassistant-addons/trillium
-          mv Dockerfile homeassistant-addons/trillium/Dockerfile.new
-          mv rootless-entrypoint.sh homeassistant-addons/trillium/rootless-entrypoint.sh.new
+          mv Dockerfile trillium/Dockerfile.new
+          mv rootless-entrypoint.sh trillium/rootless-entrypoint.sh.new
 
           CHANGED=0
 
           for file in Dockerfile rootless-entrypoint.sh; do
-            new_file="homeassistant-addons/trillium/$file.new"
-            old_file="homeassistant-addons/trillium/$file"
+            new_file="trillium/$file.new"
+            old_file="trillium/$file"
             if [ ! -f "$old_file" ] || ! cmp -s "$new_file" "$old_file"; then
               mv "$new_file" "$old_file"
               echo "$file changed or added."
@@ -59,5 +58,14 @@ jobs:
 
           echo "::set-output name=changed::$CHANGED"
 
-      - name: List homeassistant-addons/trillium after moving files
-        run: ls -la homeassis
+      - name: List trillium folder after moving files
+        run: ls -la trillium
+
+      - name: Commit and push if changed
+        if: steps.move_and_check.outputs.changed == '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add trillium/Dockerfile trillium/rootless-entrypoint.sh
+          git commit -m "Update patched Dockerfile and entrypoint"
+          git push
