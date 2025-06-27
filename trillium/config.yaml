@@ -18,9 +18,18 @@
     "TRILIUM_OAUTH_ISSUER_NAME": ""
   },
   "name": "Trilium Next - Test",
-  "map": [
-    "/home/node/trilium-data:rw"
-  ],
+"map": [
+  {
+    "type": "data",
+    "read_only": false,
+    "path": "/home/node/trilium-data"
+  },
+  {
+    "type": "config",
+    "read_only": false,
+    "path": "/config"
+  }
+]
   "options": {},
   "expose": {
     "8080/tcp": {}
