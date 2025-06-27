@@ -27,7 +27,7 @@
   {
     "type": "config",
     "read_only": false,
-    "path": "/config/log"
+    "path": "/config"
   }
 ]
   "options": {},
