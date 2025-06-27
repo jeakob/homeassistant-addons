@@ -1,52 +1,52 @@
-name: Build and Push TriliumNext Rootless Add-on
+name: Update README with Version
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'
+    paths:
+      - build.yml  # Trigger workflow only when build.yml is modified
 
 jobs:
-  build:
+  update-readme:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Download rootless Dockerfile
-        run: curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine.rootless
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
 
-      - name: Download rootless entrypoint script
-        run: curl -o rootless-entrypoint.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/rootless-entrypoint.sh
+    - name: Parse version from build.yml
+      id: parse_version
+      run: |
+        import yaml
+        
+        # Read the build.yml file
+        with open('build.yml', 'r') as file:
+            config = yaml.safe_load(file)
+        
+        # Extract version info (we will use the amd64 version here)
+        version = config['build_from']['amd64'].split(':')[1]  # Extract version after the colon
+        
+        # Save the version to an environment variable
+        print(f"VERSION={version}")
+        print(f"::set-output name=version::{version}")
 
-      - name: Patch Dockerfile for Home Assistant add-on
-        run: |
-          sed -i 's|/home/trilium-data|/data|g' Dockerfile
-          # Ensure TRILIUM_DATA_DIR is set to /data
-          grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
+    - name: Update README.md with version
+      run: |
+        VERSION="${{ steps.parse_version.outputs.version }}"
+        
+        # Replace the VERSION_PLACEHOLDER in the header
+        sed -i "s/# TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER/# TriliumNext Notes for Home Assistant Version: ${VERSION}/g" README.md
 
-      - name: Extract version from build.yaml
-        id: extract_version
-        run: |
-          VERSION=$(grep 'version:' build.yaml | awk '{print $2}')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version extracted: $VERSION"
-
-      - name: Update README.md with version
-        run: |
-          echo "Updating README.md with version: $VERSION"
-          sed -i "s|version: .*|version: $VERSION|g" README.md
-
-      - name: List files after updates
-        run: ls -la
-
-      - name: Commit and push changes to README.md
-        if: ${{ env.VERSION }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update README.md with version $VERSION"
-          git push
+    - name: Commit changes
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        
+        # Commit and push changes to README.md
+        git add README.md
+        git commit -m "Update README with version ${VERSION}"
+        git push
