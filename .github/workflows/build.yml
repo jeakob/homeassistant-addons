@@ -1,17 +1,15 @@
-name: Prepare TriliumNext Add-on Files
+name: TrilliumNext Update Dockerfile and Entrypoint
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'  # every day at 6:00 UTC
 
 jobs:
-  prepare:
+  update-files:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Download rootless Dockerfile
@@ -26,18 +24,33 @@ jobs:
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
           sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
 
-      - name: Move patched files to addon folder
+      - name: Check for changes and move files
+        id: move_and_check
         run: |
-          mv Dockerfile homeassistant-addons/trillium/
-          mv rootless-entrypoint.sh homeassistant-addons/trillium/
+          mv Dockerfile homeassistant-addons/trillium/Dockerfile.new
+          mv rootless-entrypoint.sh homeassistant-addons/trillium/rootless-entrypoint.sh.new
 
-      - name: Commit and push patched files
+          CHANGED=0
+
+          for file in Dockerfile rootless-entrypoint.sh; do
+            new_file="homeassistant-addons/trillium/$file.new"
+            old_file="homeassistant-addons/trillium/$file"
+            if [ ! -f "$old_file" ] || ! cmp -s "$new_file" "$old_file"; then
+              mv "$new_file" "$old_file"
+              echo "$file changed or added."
+              CHANGED=1
+            else
+              rm "$new_file"
+            fi
+          done
+
+          echo "::set-output name=changed::$CHANGED"
+
+      - name: Commit and push if changed
+        if: steps.move_and_check.outputs.changed == '1'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add homeassistant-addons/trillium/Dockerfile homeassistant-addons/trillium/rootless-entrypoint.sh
-          git commit -m "Add patched Dockerfile and entrypoint for Home Assistant add-on" || echo "No changes to commit"
+          git commit -m "Update patched Dockerfile and entrypoint"
           git push
-        env:
-          # GITHUB_TOKEN is automatically available in GitHub Actions for pushing commits
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
