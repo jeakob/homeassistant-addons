@@ -13,14 +13,23 @@ if ! id node >/dev/null 2>&1; then
     adduser -D -s /bin/sh -u ${USER_UID} -G node node 2>/dev/null || true
 fi
 
-# Create all necessary directories with wide permissions first
-mkdir -p /data/tmp /data/log /home/node/trilium-data
-mkdir -p /config/tmp /config/log
+# Create all necessary directories under /data (not /config)
+mkdir -p /data/tmp /data/log /data/trilium-data
 
-# Set very permissive permissions to ensure Node.js can write
-chmod -R 777 /config
-chmod -R 777 /data
-chown -R ${USER_UID}:${USER_GID} /data /home/node/trilium-data /config
+# Set ownership and permissions for /data
+chown -R ${USER_UID}:${USER_GID} /data
+chmod -R 755 /data
+
+# Create symlinks from /config to /data to redirect the app
+mkdir -p /config 2>/dev/null || true
+ln -sf /data/tmp /config/tmp 2>/dev/null || true
+ln -sf /data/log /config/log 2>/dev/null || true
+
+# Set environment variables to redirect everything to /data
+export TRILIUM_DATA_DIR="/data/trilium-data"
+export TMPDIR="/data/tmp"
+export TEMP="/data/tmp"
+export XDG_CONFIG_HOME="/data"
 
 # Debug: Show directory permissions
 echo "Directory permissions:"
