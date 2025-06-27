@@ -1,8 +1,6 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
-USER root
-RUN mkdir -p /config/tmp /config/log && chown -R node:node /config/tmp /config/log
-USER node
+
 # Set shell
 SHELL ["/bin/sh", "-c"]
 
