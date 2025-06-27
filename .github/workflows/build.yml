@@ -1,4 +1,4 @@
-name: TrilliumNext Update Dockerfile and Entrypoint
+name: TrilliumNext Update Dockerfile, Entrypoint, and package.json
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # daily at midnight UTC
+    - cron: '0 0 * * *'
 
 jobs:
   update-files:
@@ -29,9 +29,6 @@ jobs:
 
       - name: List repo root after downloads
         run: ls -la
-        # Also list trillium folder to confirm package.json
-      - name: List trillium folder after downloads
-        run: ls -la trillium
 
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
@@ -48,9 +45,12 @@ jobs:
           mv Dockerfile trillium/Dockerfile.new
           mv rootless-entrypoint.sh trillium/rootless-entrypoint.sh.new
 
+          # package.json was downloaded directly into trillium, copy it for comparison
+          cp trillium/package.json trillium/package.json.new
+
           CHANGED=0
 
-          for file in Dockerfile rootless-entrypoint.sh; do
+          for file in Dockerfile rootless-entrypoint.sh package.json; do
             new_file="trillium/$file.new"
             old_file="trillium/$file"
             if [ ! -f "$old_file" ] || ! cmp -s "$new_file" "$old_file"; then
@@ -72,6 +72,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add trillium/Dockerfile trillium/rootless-entrypoint.sh
-          git commit -m "Update patched Dockerfile and entrypoint"
+          git add trillium/Dockerfile trillium/rootless-entrypoint.sh trillium/package.json
+          git commit -m "Update patched Dockerfile, entrypoint, and package.json"
           git push
