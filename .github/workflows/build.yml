@@ -15,11 +15,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: List repo root before downloads
+        run: ls -la
+
       - name: Download rootless Dockerfile
         run: curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine.rootless
 
       - name: Download rootless entrypoint script
         run: curl -o rootless-entrypoint.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/rootless-entrypoint.sh
+
+      - name: List repo root after downloads
+        run: ls -la
 
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
@@ -27,11 +33,15 @@ jobs:
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
           sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
 
+      - name: List repo root after patching Dockerfile
+        run: ls -la
+
       - name: Check for changes and move files
         id: move_and_check
         run: |
-          mv Dockerfile ./trillium/Dockerfile.new
-          mv rootless-entrypoint.sh ./trillium/rootless-entrypoint.sh.new
+          # Use consistent path here: your repo folder is homeassistant-addons/trillium
+          mv Dockerfile homeassistant-addons/trillium/Dockerfile.new
+          mv rootless-entrypoint.sh homeassistant-addons/trillium/rootless-entrypoint.sh.new
 
           CHANGED=0
 
@@ -49,11 +59,5 @@ jobs:
 
           echo "::set-output name=changed::$CHANGED"
 
-      - name: Commit and push if changed
-        if: steps.move_and_check.outputs.changed == '1'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add homeassistant-addons/trillium/Dockerfile homeassistant-addons/trillium/rootless-entrypoint.sh
-          git commit -m "Update patched Dockerfile and entrypoint"
-          git push
+      - name: List homeassistant-addons/trillium after moving files
+        run: ls -la homeassis
