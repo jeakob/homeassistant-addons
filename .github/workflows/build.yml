@@ -30,8 +30,8 @@ jobs:
       - name: Check for changes and move files
         id: move_and_check
         run: |
-          mv Dockerfile /trillium/Dockerfile.new
-          mv rootless-entrypoint.sh /trillium/rootless-entrypoint.sh.new
+          mv Dockerfile ./trillium/Dockerfile.new
+          mv rootless-entrypoint.sh ./trillium/rootless-entrypoint.sh.new
 
           CHANGED=0
 
