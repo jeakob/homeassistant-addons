@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # daily at midnight UTC
 
 jobs:
   update-files:
@@ -24,8 +24,14 @@ jobs:
       - name: Download rootless entrypoint script
         run: curl -o rootless-entrypoint.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/rootless-entrypoint.sh
 
+      - name: Download package.json from TriliumNext main repo
+        run: curl -o trillium/package.json https://raw.githubusercontent.com/TriliumNext/Trilium/main/package.json
+
       - name: List repo root after downloads
         run: ls -la
+        # Also list trillium folder to confirm package.json
+      - name: List trillium folder after downloads
+        run: ls -la trillium
 
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
