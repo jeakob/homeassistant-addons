@@ -11,6 +11,8 @@
   "environment": {
     "TRILIUM_DATA_DIR": "/data",
     "NO_AUTHENTICATION": "true",
+    "USER_UID": "1000",
+    "USER_GID": "1000",
     "TRILIUM_OAUTH_BASE_URL": "",
     "TRILIUM_OAUTH_CLIENT_ID": "",
     "TRILIUM_OAUTH_CLIENT_SECRET": "",
