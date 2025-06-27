@@ -6,7 +6,7 @@ on:
     paths:
       - 'trillium/build.yaml'
   schedule:
-    - cron: '0 6 * * *' # every day at 6:00 UTC
+    - cron: '5 6 * * *'  # Every day at 6:05 UTC
 jobs:
   update-readme:
     runs-on: ubuntu-latest
