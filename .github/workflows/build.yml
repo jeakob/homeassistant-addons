@@ -23,9 +23,21 @@ jobs:
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
           sed -i 's|/home/trilium-data|/data|g' Dockerfile
-          # Ensure TRILIUM_DATA_DIR is set to /data
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
-          # Remove COPY ./dist line to avoid build error
           sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
 
-      # No build or push steps here
+      - name: Move patched files to addon folder
+        run: |
+          mv Dockerfile homeassistant-addons/trillium/
+          mv rootless-entrypoint.sh homeassistant-addons/trillium/
+
+      - name: Commit and push patched files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add homeassistant-addons/trillium/Dockerfile homeassistant-addons/trillium/rootless-entrypoint.sh
+          git commit -m "Add patched Dockerfile and entrypoint for Home Assistant add-on" || echo "No changes to commit"
+          git push
+        env:
+          # GITHUB_TOKEN is automatically available in GitHub Actions for pushing commits
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
