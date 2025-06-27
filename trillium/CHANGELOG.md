@@ -1,5 +1,3 @@
-# Changelog for TriliumNext Notes v0.95.0
-
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
