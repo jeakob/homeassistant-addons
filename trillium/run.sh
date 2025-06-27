@@ -13,19 +13,30 @@ if ! id node >/dev/null 2>&1; then
     adduser -D -s /bin/sh -u ${USER_UID} -G node node 2>/dev/null || true
 fi
 
-# Create necessary directories
-mkdir -p /data/tmp /data/log /home/node/trilium-data /config
+# Create all necessary directories first
+mkdir -p /data/tmp /data/log /home/node/trilium-data
+mkdir -p /config/tmp /config/log
 
-# Remove any existing symlinks and recreate them
-rm -rf /config/tmp /config/log 2>/dev/null || true
-ln -sf /data/tmp /config/tmp
-ln -sf /data/log /config/log
-
-# Set ownership and permissions for all directories
+# Set ownership and permissions BEFORE creating symlinks
 chown -R ${USER_UID}:${USER_GID} /data /home/node/trilium-data /config
 chmod -R 755 /data /home/node/trilium-data /config
 
-echo "Directory setup complete"
+# Now create symlinks to redirect to /data (optional optimization)
+# Only do this if you want to use /data for persistence
+if [ "$USE_DATA_SYMLINKS" = "true" ]; then
+    rm -rf /config/tmp /config/log 2>/dev/null || true
+    ln -sf /data/tmp /config/tmp
+    ln -sf /data/log /config/log
+    chown -h ${USER_UID}:${USER_GID} /config/tmp /config/log 2>/dev/null || true
+fi
+
+# Debug: Show directory permissions
+echo "Directory permissions:"
+ls -la /config/
+echo "Node user info:"
+id node 2>/dev/null || echo "Node user not found"
+echo "Current user: $(whoami)"
+echo "Process will run as UID: ${USER_UID}, GID: ${USER_GID}"
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
 
