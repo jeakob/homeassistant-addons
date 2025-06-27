@@ -33,6 +33,9 @@ LABEL \
     io.hass.type="addon" \
     io.hass.arch="${BUILD_ARCH}"
 
+# Expose the port
+EXPOSE 8080
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
   CMD wget --quiet --tries=1 --spider http://localhost:8080/ || exit 1
