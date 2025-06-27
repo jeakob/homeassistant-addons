@@ -4,6 +4,8 @@ FROM ${BUILD_FROM}
 # Set shell
 SHELL ["/bin/sh", "-c"]
 
+# Install su-exec to switch user
+RUN apk add --no-cache su-exec
 # Install Node.js and npm if not already present in base image
 RUN if ! command -v node > /dev/null 2>&1; then \
         apk add --no-cache nodejs npm; \
