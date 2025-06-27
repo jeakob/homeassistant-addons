@@ -4,10 +4,13 @@ set -e
 # Ensure data directory exists with proper permissions
 mkdir -p /home/node/trilium-data
 mkdir -p /config
+mkdir -p /config/log
 chown -R node:node /home/node/trilium-data
 chmod -R 755 /home/node/trilium-data
 chmod -R 755 /config
+chmod -R 755 /config/log
 chown -R node:node /config
+chown -R node:node /config/log
 
 echo "Starting TriliumNext Notes..."
 echo "Web interface available at: http://$(hostname):8080"
