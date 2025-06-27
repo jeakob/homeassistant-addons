@@ -1,9 +1,9 @@
 name: Update README with Version
 
 on:
-  push:
-    paths:
-      - build.yml  # Trigger workflow only when build.yml is modified
+  workflow_dispatch:
+  schedule:
+    - cron: '/5 * * * *' # every day at 6:00 UTC
 
 jobs:
   update-readme:
