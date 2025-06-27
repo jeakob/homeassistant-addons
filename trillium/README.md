@@ -1,4 +1,4 @@
-![128x128](https://github.com/user-attachments/assets/7b39fd05-4c0d-46f3-8283-117e2093f3e3)
+<img src="trill.png" width="100" height="100">
 
 # TriliumNext Notes for Home Assistant
 
@@ -22,7 +22,7 @@ Follow these steps to install the TriliumNext Notes addon on your Home Assistant
    - Open Home Assistant, go to **Settings** → **Add-ons** → **Add-on Store**.
    - Click on the **three dots** in the top right corner and select **Repositories**.
    - Paste the following URL into the "Repository URL" field:
-     ```https://github.com/HyperCriSiS/Home-Assistant-Addons```
+     ```(https://github.com/jeakob/homeassistant-addon)```
    - Click **Add**.
 
    [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fjeakob%2Fhomeassistant-addons)
@@ -35,10 +35,8 @@ Follow these steps to install the TriliumNext Notes addon on your Home Assistant
 
 ## Initial Configuration
 
-Upon first launch, the setup will start. During this process, you will see the IP address and port of your Home Assistant instance. This is due to Home Assistant's ingress system, but you should **ignore this URL**. 
-
 To access TriliumNext Notes:
-- Use the Home Assistant **ingress** feature (through the Home Assistant UI or sidebar).
+- Use the Home Assistant **ingress** feature (through the Home Assistant UI or sidebar). Alternatively, browse directly to the addon using port **8080**.
 - Create a user and set a secure password for accessing your notes.
 
 ## Configuration Options
