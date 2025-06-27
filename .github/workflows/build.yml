@@ -1,15 +1,13 @@
-name: Build and Push TriliumNext Rootless Add-on
+name: Prepare TriliumNext Add-on Files
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'  # daily at midnight UTC
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,22 +22,10 @@ jobs:
 
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
-          # Redirect data path to /data
           sed -i 's|/home/trilium-data|/data|g' Dockerfile
-
           # Ensure TRILIUM_DATA_DIR is set to /data
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
+          # Remove COPY ./dist line to avoid build error
+          sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
 
-          # Remove frontend-related steps and files
-          sed -i '/COPY\s\+\.\/*docker\/package.json.*/d' Dockerfile
-          sed -i '/COPY\s\+\.\/*docker\/pnpm-workspace.yaml.*/d' Dockerfile
-          sed -i '/pnpm install/d' Dockerfile
-          sed -i '/pnpm rebuild/d' Dockerfile
-          sed -i '/COPY\s\+\.\/*dist.*/d' Dockerfile
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: jeakob/triliumnext-notes:latest
+      # No build or push steps here
