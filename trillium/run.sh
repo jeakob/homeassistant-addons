@@ -1,4 +1,4 @@
-#!/bin/shMore actions
+#!/bin/sh
 set -e
 
 echo "Setting up TriliumNext Notes..."
