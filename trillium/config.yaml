@@ -19,7 +19,7 @@
   },
   "name": "Trilium Next - Test",
   "map": [
-    "addon_config:rw"
+    "/home/node/trilium-data:rw"
   ],
   "options": {},
   "expose": {
