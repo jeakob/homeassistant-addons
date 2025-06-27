@@ -35,7 +35,7 @@ jobs:
       - name: Update trillium/README.md with version
         if: env.VERSION
         run: |
-          sed -i -E "s#TriliumNext Notes for Home Assistant Version: v[0-9]+\.[0-9]+\.[0-9]+#TriliumNext Notes Version: ${VERSION} for Home Assistant#g" trillium/README.md
+          sed -i -E "s#TriliumNext Notes Version: v[0-9]+\.[0-9]+\.[0-9]+ for Home Assistant#TriliumNext Notes Version: ${VERSION} for Home Assistant#g" trillium/README.md
           echo "trillium/README.md updated with version ${VERSION}."
 
       - name: Commit changes
