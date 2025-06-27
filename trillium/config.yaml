@@ -26,12 +26,22 @@ options:
   log_level: "info"
   https_only: false
   expose_port: true  # Set this to false to disable port exposure
+  tril_issuer_base_url: ""
+  tril_base_url: ""
+  tril_client_id: ""
+  tril_client_secret: ""
+  tril_issuer_name: ""
 schema:
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
   log_level: "list(trace|debug|info|notice|warning|error|fatal)"
   https_only: "bool"
   expose_port: "bool"  # A boolean option to control port exposure
+  tril_issuer_base_url: "str?"
+  tril_base_url: "str?"
+  tril_client_id: "str?"
+  tril_client_secret: "str?"
+  tril_issuer_name: "str?"
 environment:
   TRILIUM_DATA_DIR: "/data/trilium-data"  # Use /data for persistent data storage
   USER_UID: "1000"
