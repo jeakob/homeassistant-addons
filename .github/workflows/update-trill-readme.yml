@@ -1,0 +1,52 @@
+name: Build and Push TriliumNext Rootless Add-on
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download rootless Dockerfile
+        run: curl -o Dockerfile https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/Dockerfile.alpine.rootless
+
+      - name: Download rootless entrypoint script
+        run: curl -o rootless-entrypoint.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/rootless-entrypoint.sh
+
+      - name: Patch Dockerfile for Home Assistant add-on
+        run: |
+          sed -i 's|/home/trilium-data|/data|g' Dockerfile
+          # Ensure TRILIUM_DATA_DIR is set to /data
+          grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
+
+      - name: Extract version from build.yaml
+        id: extract_version
+        run: |
+          VERSION=$(grep 'version:' build.yaml | awk '{print $2}')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version extracted: $VERSION"
+
+      - name: Update README.md with version
+        run: |
+          echo "Updating README.md with version: $VERSION"
+          sed -i "s|version: .*|version: $VERSION|g" README.md
+
+      - name: List files after updates
+        run: ls -la
+
+      - name: Commit and push changes to README.md
+        if: ${{ env.VERSION }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update README.md with version $VERSION"
+          git push
