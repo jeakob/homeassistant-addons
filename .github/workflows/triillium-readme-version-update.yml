@@ -19,12 +19,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: List files for debugging
-      run: |
-        echo "Current directory: $(pwd)"
-        echo "Contents of 'trillium' directory:"
-        ls -al trillium/
-
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -41,19 +35,27 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "Version extracted: $VERSION"
 
-    - name: Update trillium/README.md with version
+    - name: Update trillium/README.md with version and reorder text
       # This step only runs if a version was successfully extracted
       if: env.VERSION
       run: |
-        # The placeholder in your README that will be replaced.
-        # Example: TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER
-        PLACEHOLDER="VERSION_PLACEHOLDER"
+        README_PATH="trillium/README.md"
+        CURRENT_TEXT_PATTERN="TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER"
+        
+        # Use sed to capture parts of the line and reorder them.
+        # (.*) captures "TriliumNext Notes"
+        # (Version:) captures "Version:"
+        # (.*) captures the placeholder (or existing version)
+        # (for Home Assistant) captures "for Home Assistant"
+        # We then rearrange them in the replacement string.
+        sed -i -E "s#(.*) (Version:) (.*) (for Home Assistant)#\1 \2 ${{ env.VERSION }} \4#g" "${README_PATH}"
+        
+        # Now, handle the specific reordering if the pattern is exactly "TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER"
+        # This step will reorder the fixed string to the new desired format.
+        # It's important to run this after the version insertion to ensure the version is present.
+        sed -i -E "s#TriliumNext Notes (.*) for Home Assistant (Version: .*$)#TriliumNext Notes Version: \2 \1#g" "${README_PATH}"
 
-        # Use sed to find and replace the placeholder with the actual version.
-        # The use of a different delimiter for sed (#) avoids conflicts if the version contains slashes.
-        # --- CORRECTED PATH HERE ---
-        sed -i "s#${PLACEHOLDER}#${{ env.VERSION }}#g" trillium/README.md
-        echo "trillium/README.md updated."
+        echo "${README_PATH} updated."
 
 
     - name: Commit changes
