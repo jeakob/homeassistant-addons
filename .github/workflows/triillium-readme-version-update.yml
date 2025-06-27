@@ -12,6 +12,13 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      
+    - name: List current directory and files
+      run: |
+        echo "Current directory:"
+        pwd  # Print current directory
+        echo "Contents of the current directory:"
+        ls -alh  # List all files with detailed information
 
     - name: Set up Python
       uses: actions/setup-python@v3
