@@ -27,9 +27,3 @@ jobs:
           # Ensure TRILIUM_DATA_DIR is set to /data
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: jeakob/triliumnext-notes:latest
