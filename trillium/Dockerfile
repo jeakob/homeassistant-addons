@@ -4,6 +4,10 @@ FROM ${BUILD_FROM}
 # Set shell
 SHELL ["/bin/sh", "-c"]
 
+# Copy data for add-on
+COPY run.sh /
+RUN chmod a+x /run.sh
+
 # Install Node.js and npm if not already present in base image
 RUN if ! command -v node > /dev/null 2>&1; then \
         apk add --no-cache nodejs npm; \
@@ -20,10 +24,6 @@ RUN mkdir -p /data/tmp /data/log /data/trilium-data && \
 
 # Add volume declaration
 VOLUME ["/data"]
-
-# Copy data for add-on
-COPY run.sh /
-RUN chmod a+x /run.sh
 
 # Home Assistant requires these labels
 LABEL \
