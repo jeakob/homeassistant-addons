@@ -14,7 +14,7 @@ RUN addgroup -g 1000 node 2>/dev/null || true && \
     adduser -D -s /bin/sh -u 1000 -G node node 2>/dev/null || true
 
 # Create necessary directories and set permissions
-RUN mkdir -p /config/tmp /data /home/node/trilium-data && \
+RUN mkdir -p /config/tmp /config/log /data/tmp /data/log /home/node/trilium-data && \
     chown -R 1000:1000 /config /data /home/node && \
     chmod -R 755 /config /data /home/node
 
