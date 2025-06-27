@@ -32,9 +32,17 @@ jobs:
 
       - name: Patch Dockerfile for Home Assistant add-on
         run: |
+          # Change data dir
           sed -i 's|/home/trilium-data|/data|g' Dockerfile
+
+          # Add TRILIUM_DATA_DIR if missing
           grep -q 'ENV TRILIUM_DATA_DIR' Dockerfile || echo 'ENV TRILIUM_DATA_DIR=/data' >> Dockerfile
+
+          # Remove problematic COPY for ./dist
           sed -i '/COPY\s\+\.\/*dist/d' Dockerfile
+
+          # Fix COPY for package.json to point to correct path
+          sed -i 's|COPY\s\+\./docker/package.json.*|COPY ./trillium/package.json /usr/src/app/|' Dockerfile
 
       - name: List repo root after patching Dockerfile
         run: ls -la
