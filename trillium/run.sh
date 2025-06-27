@@ -3,6 +3,7 @@ set -e
 
 # Ensure data directory exists with proper permissions
 mkdir -p /home/node/trilium-data
+mkdir - /config
 chown -R node:node /home/node/trilium-data
 chmod -R 755 /home/node/trilium-data
 chmod -R 755 /config
