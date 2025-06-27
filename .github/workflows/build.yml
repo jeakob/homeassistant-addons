@@ -24,8 +24,8 @@ jobs:
       - name: Download rootless entrypoint script
         run: curl -o rootless-entrypoint.sh https://raw.githubusercontent.com/TriliumNext/Notes/develop/apps/server/rootless-entrypoint.sh
 
-      - name: Download package.json from TriliumNext main repo
-        run: curl -o trillium/package.json https://raw.githubusercontent.com/TriliumNext/Trilium/main/package.json
+      - name: Download latest package.json from upstream
+        run: curl -o trillium/package.json.new https://raw.githubusercontent.com/TriliumNext/Trilium/main/package.json
 
       - name: List repo root after downloads
         run: ls -la
@@ -45,9 +45,6 @@ jobs:
           mv Dockerfile trillium/Dockerfile.new
           mv rootless-entrypoint.sh trillium/rootless-entrypoint.sh.new
 
-          # package.json was downloaded directly into trillium, copy it for comparison
-          cp trillium/package.json trillium/package.json.new
-
           CHANGED=0
 
           for file in Dockerfile rootless-entrypoint.sh package.json; do
@@ -62,7 +59,7 @@ jobs:
             fi
           done
 
-          echo "::set-output name=changed::$CHANGED"
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
       - name: List trillium folder after moving files
         run: ls -la trillium
