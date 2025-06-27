@@ -21,22 +21,13 @@ jobs:
     - name: Parse version from build.yml
       id: parse_version
       run: |
-        import yaml
-        
-        # Read the build.yml file
-        with open('./trillium/build.yml', 'r') as file:
-            config = yaml.safe_load(file)
-        
-        # Extract version info (we will use the amd64 version here)
-        version = config['build_from']['amd64'].split(':')[1]  # Extract version after the colon
-        
-        # Save the version to an environment variable
-        print(f"VERSION={version}")
-        print(f"::set-output name=version::{version}")
+        VERSION=$(grep 'version:' build.yml | awk '{print $2}')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "Version extracted: $VERSION"
 
     - name: Update README.md with version
       run: |
-        VERSION="${{ steps.parse_version.outputs.version }}"
+        VERSION="${{ env.VERSION }}"
         
         # Replace the VERSION_PLACEHOLDER in the header
         sed -i "s/# TriliumNext Notes for Home Assistant Version: VERSION_PLACEHOLDER/# TriliumNext Notes for Home Assistant Version: ${VERSION}/g" README.md
