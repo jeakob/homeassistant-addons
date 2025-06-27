@@ -2,6 +2,11 @@
 set -e
 
 # Ensure data directory exists with proper permissions
+mkdir -p /data/tmp /data/log
+rm -rf /config/tmp /config/log
+ln -s /data/tmp /config/tmp
+ln -s /data/log /config/log
+
 mkdir -p /home/node/trilium-data
 mkdir -p /config
 mkdir -p /config/log
