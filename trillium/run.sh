@@ -51,4 +51,4 @@ echo "Starting TriliumNext Notes with ingress configuration..."
 echo "Running as user: $(id ${USER_UID} 2>/dev/null || echo "UID ${USER_UID}")"
 
 # Start the application as the node user
-exec su -s ${USER_UID}:${USER_GID} node main.cjs --host 0.0.0.0 --port 8080
+exec su -s /bin/sh node -c "node main.cjs --host 0.0.0.0 --port 8080"
