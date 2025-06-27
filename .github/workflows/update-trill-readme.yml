@@ -24,7 +24,7 @@ jobs:
         import yaml
         
         # Read the build.yml file
-        with open('build.yml', 'r') as file:
+        with open('./trillium/build.yml', 'r') as file:
             config = yaml.safe_load(file)
         
         # Extract version info (we will use the amd64 version here)
