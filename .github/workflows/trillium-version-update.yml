@@ -18,8 +18,8 @@ jobs:
         with:
           script: |
             const res = await github.rest.repos.getLatestRelease({
-              owner: 'trillium',
-              repo: 'notes'
+              owner: 'triliumnext',
+              repo: 'trilium'
             });
             core.setOutput("tag", res.data.tag_name);
             core.setOutput("body", res.data.body);
