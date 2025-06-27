@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/shMore actions
 set -e
 
 echo "Setting up TriliumNext Notes..."
@@ -36,16 +36,8 @@ id node 2>/dev/null || echo "Node user not found"
 # Show current user and process UID/GID
 echo "Current user: $(whoami)"
 echo "Process will run as UID: ${USER_UID}, GID: ${USER_GID}"
-
-# Setup and print web interface availability
 echo "Starting TriliumNext Notes..."
-EXPOSE_PORT=${EXPOSE_PORT:-true}
-
-if [ "$EXPOSE_PORT" = "true" ]; then
-    echo "Web interface will be available at: http://$(hostname):8080"
-else
-    echo "Port exposure is disabled. Web interface will be available through Home Assistant Ingress."
-fi
+echo "Web interface available at: http://$(hostname):8080"
 
 # Important for Home Assistant Ingress
 export TRILIUM_BASE_URL="/api/hassio_ingress/${HOSTNAME}"
@@ -58,10 +50,5 @@ cd "$APP_DIR"
 echo "Starting TriliumNext Notes with ingress configuration..."
 echo "Running as user: $(id ${USER_UID} 2>/dev/null || echo "UID ${USER_UID}")"
 
-# Start the application with or without port exposure
-if [ "$EXPOSE_PORT" = "true" ]; then
-    exec su -s /bin/sh node -c "node main.cjs --host 0.0.0.0 --port 8080"
-else
-    # Start the app without port exposure (it's handled by ingress)
-    exec su -s /bin/sh node -c "node main.cjs --host 0.0.0.0 --port 8080 --no-expose-port"
-fi
+# Start the application as the node user
+exec su -s /bin/sh node -c "node main.cjs --host 0.0.0.0 --port 8080"
