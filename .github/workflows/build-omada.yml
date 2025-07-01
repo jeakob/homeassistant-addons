@@ -31,7 +31,6 @@ jobs:
           # Create customized Dockerfile in your repo folder
           cat > homeassistant-addons/omada-controller/Dockerfile <<EOF
 FROM mbentley/ubuntu:20.04
-
 LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"
 LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
 
