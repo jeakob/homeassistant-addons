@@ -18,6 +18,15 @@ jobs:
         run: |
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
 
+      - name: Fetch required scripts and files from upstream repo
+        run: |
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o healthcheck.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o install.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o entrypoint.sh
+          mkdir -p mbentley
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o mbentley/install.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o mbentley/entrypoint-5.x.sh
+
       - name: Create custom Dockerfile
         run: |
           echo 'FROM mbentley/ubuntu:20.04' > Dockerfile
@@ -25,11 +34,7 @@ jobs:
           echo 'LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"' >> Dockerfile
           echo 'LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"' >> Dockerfile
           echo '' >> Dockerfile
-          echo 'COPY / /' >> Dockerfile
-          echo 'COPY healthcheck.sh install.sh /' >> Dockerfile
-          echo 'COPY mbentley/install.sh /mbentley/' >> Dockerfile
-          echo 'COPY entrypoint.sh /' >> Dockerfile
-          echo 'COPY mbentley/entrypoint-5.x.sh /mbentley/' >> Dockerfile
+          echo 'COPY . /' >> Dockerfile
           echo '' >> Dockerfile
           INSTALL_VER_LINE=$(grep 'ARG INSTALL_VER' Dockerfile.upstream | head -n1)
           echo "${INSTALL_VER_LINE}" >> Dockerfile
