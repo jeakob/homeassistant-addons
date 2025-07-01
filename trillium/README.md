@@ -1,6 +1,6 @@
 <img src="icon.png" width="100" height="100">
 
-# TriliumNext Notes Version: v0.95.0 for Home Assistant
+# TriliumNext Notes Version: v0.96.0 for Home Assistant
 
 
 ## About
