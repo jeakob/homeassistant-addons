@@ -42,6 +42,7 @@ jobs:
           echo 'ARG ARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'ARG NO_MONGODB=false' >> homeassistant-addons/omada-controller/Dockerfile
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'RUN chmod +x /install.sh && /install.sh || (echo "install.sh failed with code $?"; exit 1) && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'RUN chmod +x /install.sh && /install.sh && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'WORKDIR /opt/tplink/EAPController/lib' >> homeassistant-addons/omada-controller/Dockerfile
