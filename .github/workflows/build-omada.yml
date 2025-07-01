@@ -18,7 +18,7 @@ jobs:
         run: |
           mkdir -p homeassistant-addons/omada-controller/mbentley
 
-          # Fetch upstream Dockerfile
+          # Fetch upstream Dockerfile (for reference, not directly used)
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
 
           # Fetch missing scripts
@@ -28,28 +28,27 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
 
-          # Create customized Dockerfile in your repo folder
-          cat > homeassistant-addons/omada-controller/Dockerfile <<EOF
-FROM mbentley/ubuntu:20.04
-LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"
-LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
-
-COPY ./ / 
-
-ARG INSTALL_VER=5.5.7
-ARG TARGETARCH=amd64
-ARG BUILD_ARCH
-ARG ARCH=amd64
-ARG NO_MONGODB=false
-
-RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
-
-WORKDIR /opt/tplink/EAPController/lib
-EXPOSE 29810/udp 29811 29812 29813
-VOLUME ["/data"]
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
-EOF
+          # Create customized Dockerfile line by line
+          echo 'FROM mbentley/ubuntu:20.04' > homeassistant-addons/omada-controller/Dockerfile
+          echo '' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"' >> homeassistant-addons/omada-controller/Dockerfile
+          echo '' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'COPY ./ /' >> homeassistant-addons/omada-controller/Dockerfile
+          echo '' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ARG INSTALL_VER=5.5.7' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ARG TARGETARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ARG BUILD_ARCH' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ARG ARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ARG NO_MONGODB=false' >> homeassistant-addons/omada-controller/Dockerfile
+          echo '' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'RUN chmod +x /install.sh && /install.sh && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
+          echo '' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'WORKDIR /opt/tplink/EAPController/lib' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'EXPOSE 29810/udp 29811 29812 29813' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'VOLUME ["/data"]' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ENTRYPOINT ["/entrypoint.sh"]' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]' >> homeassistant-addons/omada-controller/Dockerfile
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
