@@ -42,22 +42,4 @@ jobs:
           echo 'ARG ARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'ARG NO_MONGODB=false' >> homeassistant-addons/omada-controller/Dockerfile
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'RUN chmod +x /install.sh && /install.sh || (echo "install.sh failed with code $?"; exit 1) && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'RUN chmod +x /install.sh && /install.sh && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
-          echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'WORKDIR /opt/tplink/EAPController/lib' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'EXPOSE 29810/udp 29811 29812 29813' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'VOLUME ["/data"]' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ENTRYPOINT ["/entrypoint.sh"]' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]' >> homeassistant-addons/omada-controller/Dockerfile
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest ./homeassistant-addons/omada-controller
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest
