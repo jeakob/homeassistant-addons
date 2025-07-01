@@ -36,14 +36,14 @@ jobs:
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'COPY ./ /' >> homeassistant-addons/omada-controller/Dockerfile
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ARG INSTALL_VER=5.5.7' >> homeassistant-addons/omada-controller/Dockerfile
+          echo 'ARG INSTALL_VER=5.15.24.17' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'ARG TARGETARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'ARG BUILD_ARCH' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'ARG ARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'ARG NO_MONGODB=false' >> homeassistant-addons/omada-controller/Dockerfile
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          # Add comprehensive debug output to see what's failing in install.sh
-          echo 'RUN chmod +x /install.sh && echo "=== DEBUG INFO ===" && echo "ARCH: $ARCH" && echo "TARGETARCH: $TARGETARCH" && echo "BUILD_ARCH: $BUILD_ARCH" && uname -a && cat /etc/os-release && echo "=== RUNNING INSTALL ===" && set -x && /install.sh; EXIT_CODE=$?; echo "install.sh exited with code: $EXIT_CODE"; if [ $EXIT_CODE -ne 0 ]; then echo "=== INSTALL SCRIPT FAILED ==="; echo "First 50 lines of install.sh:"; cat /install.sh | head -50; echo "=== END DEBUG ==="; exit $EXIT_CODE; fi && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
+          # Add comprehensive debug and URL validation
+          echo 'RUN chmod +x /install.sh && /install.sh && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
           echo '' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'WORKDIR /opt/tplink/EAPController/lib' >> homeassistant-addons/omada-controller/Dockerfile
           echo 'EXPOSE 29810/udp 29811 29812 29813' >> homeassistant-addons/omada-controller/Dockerfile
