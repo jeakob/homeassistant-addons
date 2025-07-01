@@ -14,33 +14,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch upstream Dockerfile
+      - name: Fetch missing files from upstream repo
         run: |
-          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
-
-      - name: Create custom Dockerfile
-        run: |
-          echo 'FROM mbentley/ubuntu:20.04' > Dockerfile
-          echo '' >> Dockerfile
-          echo 'LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"' >> Dockerfile
-          echo 'LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"' >> Dockerfile
-          echo '' >> Dockerfile
-          echo 'COPY . /' >> Dockerfile
-          echo '' >> Dockerfile
-          INSTALL_VER_LINE=$(grep 'ARG INSTALL_VER' Dockerfile.upstream | head -n1)
-          echo "${INSTALL_VER_LINE}" >> Dockerfile
-          echo 'ARG TARGETARCH=amd64' >> Dockerfile
-          echo 'ARG BUILD_ARCH' >> Dockerfile
-          echo 'ARG ARCH=amd64' >> Dockerfile
-          echo 'ARG NO_MONGODB=false' >> Dockerfile
-          echo '' >> Dockerfile
-          echo 'RUN chmod +x /install.sh && /install.sh && rm -f /install.sh' >> Dockerfile
-          echo '' >> Dockerfile
-          echo 'WORKDIR /opt/tplink/EAPController/lib' >> Dockerfile
-          echo 'EXPOSE 29810/udp 29811 29812 29813' >> Dockerfile
-          echo 'VOLUME ["/data"]' >> Dockerfile
-          echo 'ENTRYPOINT ["/entrypoint.sh"]' >> Dockerfile
-          echo 'CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]' >> Dockerfile
+          mkdir -p homeassistant-addons/omada-controller/mbentley
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -50,5 +31,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest ./homeassistant-addons/omada-controller
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest
