@@ -14,14 +14,43 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch missing files from upstream repo
+      - name: Fetch upstream Dockerfile and missing files
         run: |
           mkdir -p homeassistant-addons/omada-controller/mbentley
+
+          # Fetch upstream Dockerfile
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
+
+          # Fetch missing scripts
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+
+          # Create customized Dockerfile in your repo folder
+          cat > homeassistant-addons/omada-controller/Dockerfile <<EOF
+FROM mbentley/ubuntu:20.04
+
+LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"
+LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
+
+COPY ./ / 
+
+ARG INSTALL_VER=5.5.7
+ARG TARGETARCH=amd64
+ARG BUILD_ARCH
+ARG ARCH=amd64
+ARG NO_MONGODB=false
+
+RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
+
+WORKDIR /opt/tplink/EAPController/lib
+EXPOSE 29810/udp 29811 29812 29813
+VOLUME ["/data"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
+EOF
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
