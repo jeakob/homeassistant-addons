@@ -26,23 +26,21 @@ options:
   timezone: "Europe/Berlin"
   log_level: "info"
   https_only: false
+  trilium_oauth_issuer_name: "Authentik"
   trilium_oauth_base_url: "https://notepad2.jeak0b.duckdns.org"
+  trilium_oauth_issuer_base: "https://auth.jeakob.giize.com/application/o/trill-rpi/"
   trilium_oauth_client_id: ""
   trilium_oauth_client_secret: ""
-  trilium_oauth_issuer_name: ""
-  trilium_oauth_issuer_icon: ""
-  trilium_oauth_issuer_base: "https://auth.jeakob.giize.com/application/o/trill-rpi/" 
 schema:
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
   log_level: "list(trace|debug|info|notice|warning|error|fatal)"
   https_only: "bool"
-  trilium_oauth_base_url: "str?"
-  trilium_oauth_client_id: "str?"
-  trilium_oauth_client_secret: "str?"
-  trilium_oauth_issuer_name: "str?"
-  trilium_oauth_issuer_icon: "str?"
-  trilium_oauth_issuer_base: "str?"
+  trilium_oauth_issuer_name: str
+  trilium_oauth_base_url: str
+  trilium_oauth_issuer_base: str
+  trilium_oauth_client_id: str
+  trilium_oauth_client_secret: str
 environment:
   TRILIUM_DATA_DIR: "/data/trilium-data"  # Use /data for persistent data storage
   USER_UID: "1000"
