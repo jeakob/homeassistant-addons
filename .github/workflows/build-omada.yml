@@ -69,16 +69,16 @@ EOF
           INSTALL_VER: ${{ env.INSTALL_VER }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          echo "Using INSTALL_VER=$INSTALL_VER"
+          echo "Using INSTALL_VER=${INSTALL_VER}"
 
           docker build \
             --build-arg ARCH=amd64 \
             --build-arg TARGETARCH=amd64 \
             --build-arg BUILD_ARCH=amd64 \
             --platform linux/amd64 \
-            -t $DOCKERHUB_USERNAME/custom-omada:$INSTALL_VER \
-            -t $DOCKERHUB_USERNAME/custom-omada:latest \
+            -t ${DOCKERHUB_USERNAME}/custom-omada:${INSTALL_VER} \
+            -t ${DOCKERHUB_USERNAME}/custom-omada:latest \
             ./homeassistant-addons/omada-controller
 
-          docker push $DOCKERHUB_USERNAME/custom-omada:$INSTALL_VER
-          docker push $DOCKERHUB_USERNAME/custom-omada:latest
+          docker push ${DOCKERHUB_USERNAME}/custom-omada:${INSTALL_VER}
+          docker push ${DOCKERHUB_USERNAME}/custom-omada:latest
