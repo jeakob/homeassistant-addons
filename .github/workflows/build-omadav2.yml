@@ -20,6 +20,7 @@ jobs:
 
           # Fetch upstream Dockerfile (for reference, not directly used)
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
+          echo "INSTALL_VER=$LATEST_INSTALL_VER" >> $GITHUB_ENV
 
           # Extract the latest INSTALL_VER from upstream Dockerfile
           LATEST_INSTALL_VER=$(grep 'ARG INSTALL_VER=' Dockerfile.upstream | cut -d'"' -f2)
