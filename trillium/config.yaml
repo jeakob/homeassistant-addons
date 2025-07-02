@@ -29,6 +29,8 @@ options:
   trilium_oauth_base_url: ""
   trilium_oauth_client_id: ""
   trilium_oauth_client_secret: ""
+  trilium_oauth_issuer_name: ""
+  trilium_oauth_issuer_icon: ""
 schema:
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
@@ -37,6 +39,8 @@ schema:
   trilium_oauth_base_url: "str?"
   trilium_oauth_client_id: "str?"
   trilium_oauth_client_secret: "str?"
+  trilium_oauth_issuer_name: "str?"
+  trilium_oauth_issuer_icon: "str?"
 environment:
   TRILIUM_DATA_DIR: "/data/trilium-data"  # Use /data for persistent data storage
   USER_UID: "1000"
@@ -50,6 +54,8 @@ environment:
   TRILIUM_OAUTH_BASE_URL: "{{ options.trilium_oauth_base_url }}"
   TRILIUM_OAUTH_CLIENT_ID: "{{ options.trilium_oauth_client_id }}"
   TRILIUM_OAUTH_CLIENT_SECRET: "{{ options.trilium_oauth_client_secret }}"
+  TRILIUM_OAUTH_ISSUER_NAME: "{{ options.trilium_oauth_issuer_name }}"
+  TRILIUM_OAUTH_ISSUER_ICON: "{{ options.trilium_oauth_issuer_icon }}"
 
 # You can also set up through environment variables:
-# TRILIUM_OAUTH_BASE_URL, TRILIUM_OAUTH_CLIENT_ID, and TRILIUM_OAUTH_CLIENT_SECRET
+# TRILIUM_OAUTH_BASE_URL, TRILIUM_OAUTH
