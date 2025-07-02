@@ -1,60 +1,52 @@
+> [!NOTE]
+> The Docker image has been relocated to . Please update your configuration accordingly.
+
+> [!CAUTION]
+> The Windows versions are not signed. If this is an issue, simply wait until we fix this issue.
+
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
-> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Notes) (top-right).
+> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
-
-> [!CAUTION]
-> Sync version has been increased, so update of both the client and server are necessary.
-
-> [!IMPORTANT]
-> For canvas notes, the “Mermaid to Excalidraw” feature is no longer functional for now since it relies on an old version of Mermaid diagrams. To avoid having a large library duplicated, we had to let go of this feature. If it's an important feature to you, let us know.
 
 ## 💡 Key highlights
 
-*   Improvements to the shared notes functionality:
-    *   A new default theme was introduced called Trilium.Rocks (original development by @zerebos) and adapted to our project. New features from this theme include: search, collapsible tree, light/dark mode, mobile mobile.
-    *   Basic syntax highlighting for code blocks has been added, but only if the language is explicitly specified.
-    *   Note icons are now displayed in the share tree.
-    *   Math equations are now rendered in text notes.
+*   Thanks to a partnership with CKEditor, we now have a set of features that would otherwise be available on a commercial license only.
+    *   Slash commands for easy commands via the keyboard.
+    *   Text snippets to insert reusable pieces of text (similar to templates, but for blocks of text content).
+    *   For more information, see the user guide → Note Types → Text → Premium features.
 
 ## 🐞 Bugfixes
 
-*   Text notes stability if the editor crashes:
-    *   Data loss if the editor crashed while it was saving (causing an empty note)
-    *   Blank screen if editor crashes more than once
-*   [Zen Mode: text formatting commands are missing from UI](https://github.com/TriliumNext/Notes/issues/1370) by @SiriusXT
-*   [Links: Unable to open notes in a new window](https://github.com/TriliumNext/Notes/pull/2243) by @SiriusXT
-*   [desktop syncing issues with the app](https://github.com/TriliumNext/Notes/issues/2268)
-*   LLM bugfixes by @perfectra1n:
-    *   LLM could sometimes save the response in the wrong note
-    *   [Llama3.1 doesn't work](https://github.com/TriliumNext/Notes/issues/2200)
-*   Text notes:
-    *   [Selection gets incomplete when moving multiple lines up/down](https://github.com/TriliumNext/Notes/issues/2191) by @SiriusXT and @herrkami
-    *   [Markdown import: restore focus after importing markdown](https://github.com/TriliumNext/Notes/pull/2304) by @SiriusXT
-    *   [Ensure images opened in a new tab can be activated](https://github.com/TriliumNext/Notes/pull/2303) by @SiriusXT
-*   [Unexpected collapse after hoisting a note](https://github.com/TriliumNext/Notes/pull/2293) by @SiriusXT
+*   [“Insert note after” long-press dialog doesn’t create Note](https://github.com/TriliumNext/Notes/issues/2246)
+*   Code notes: user's font selection not respected.
+*   [Windows V0.95.0 Client Failed to sync with server (use of double-slashes)](https://github.com/TriliumNext/Notes/issues/2339) by @perfectra1n
+*   Desktop client not working on older Linux distros
+*   [NOT NULL constraint failed: revisions.title when saving an empty note](https://github.com/TriliumNext/Trilium/issues/6103)
 
 ## ✨ Improvements
 
-*   [Tab bar: ensure similar behavior between horizontal/vertical scrolling](https://github.com/TriliumNext/Notes/pull/2177) by @SiriusXT and @rom1dep
-*   [Two factor: support custom OIDC server](https://github.com/TriliumNext/Notes/pull/2198) by @koderx and @JYC333
-*   LLM improvements by @perfectra1n 
-    *   [Clarify experimental state](https://github.com/TriliumNext/Notes/pull/2217)
-    *   [Simplify (remove embedding system) in order to improve its stability](https://github.com/TriliumNext/Notes/pull/2205)
-    *   Simplify provider selection
-*   Text editor improvements
-    *   [Relocate link icon in floating toolbar](https://github.com/TriliumNext/Notes/pull/2231) by @SiriusXT
-    *   [Add text alignment options](https://github.com/TriliumNext/Notes/pull/2232) by @SiriusXT
-*   [Display a warning when using the the x86 build on ARM](https://github.com/TriliumNext/Notes/pull/2281) by @perfectra1n
+*   [Elixir language syntax highlighting for text notes](https://github.com/TriliumNext/Notes/pull/2327) (by @jshprentz) and code notes.
+*   [Autocomplete: support specifying path when creating a new note](https://github.com/TriliumNext/Notes/pull/2342) by @SiriusXT
+*   Markdown import: basic support for importing wikilinks
+*   Text notes:
+    *   Allow disabling emoji auto-completion from settings.
+    *   Allow disabling note auto-completion from settings.
+*   [Backend scripts: re-enable dayjs plugins by default](https://github.com/TriliumNext/Trilium/issues/6080)
 
 ## 📖 Documentation
 
-*   Clarify custom paths for non-root and improve nginx configuration by @hulmgulm
-*   Multi-factor authentication clarifications by @JYC333
+*   [regex search / Nix flake / restore dev docs](https://github.com/TriliumNext/Notes/pull/2341) by @FliegendeWurst
+*   New premium features in text note type.
+
+## 🌍 Internationalization
+
+*   Spanish improvements by @hasecilu
 
 ## 🛠️ Technical updates
 
-*   Express was updated to the newest major version (5).
-*   The canvas (Excalidraw) was refactored to use Preact instead of React.
-*   Desktop version: remove unnecessary locale information to save some space.
+*   flake: fix Electron version, fix Wayland support, fix source filter by @FliegendeWurst
+*   Improvements to the landing page (under development) by @FliegendeWurst
+*   Updated Node.js to v22.17.0
+*   Updated CKEditor to v45.2.1
