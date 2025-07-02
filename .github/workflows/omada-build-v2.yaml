@@ -34,6 +34,7 @@ jobs:
           echo "Using INSTALL_VER: $INSTALL_VER"
 
           echo "Fetching required scripts..."
+
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
           chmod +x homeassistant-addons/omada-controller/install.sh
 
