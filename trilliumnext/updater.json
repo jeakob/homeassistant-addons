@@ -4,6 +4,6 @@
   "repository": "jeakob/homeassistant-addons",
   "slug": "triliumnext",
   "source": "github",
-  "upstream_repo": "triliumnext/Trilium",
+  "upstream_repo": "triliumnext/trilium",
   "upstream_version": "v0.96.0"
 }
