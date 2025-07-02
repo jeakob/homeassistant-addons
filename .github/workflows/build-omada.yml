@@ -22,7 +22,7 @@ jobs:
           # Fetch upstream Dockerfile
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
 
-          # Extract INSTALL_VER
+          # Extract INSTALL_VER from upstream Dockerfile
           INSTALL_VER=$(grep 'ARG INSTALL_VER=' Dockerfile.upstream | cut -d'"' -f2)
           echo "INSTALL_VER=$INSTALL_VER" >> $GITHUB_ENV
           echo "Using INSTALL_VER: $INSTALL_VER"
@@ -34,7 +34,7 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
 
-          # Generate Dockerfile
+          # Generate Dockerfile dynamically with the fetched version
           cat <<EOF > homeassistant-addons/omada-controller/Dockerfile
 FROM mbentley/ubuntu:20.04
 
@@ -71,9 +71,9 @@ EOF
             --build-arg TARGETARCH=amd64 \
             --build-arg BUILD_ARCH=amd64 \
             --platform linux/amd64 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:${{ env.INSTALL_VER }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:$INSTALL_VER \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest \
             ./homeassistant-addons/omada-controller
 
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:${{ env.INSTALL_VER }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:$INSTALL_VER
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest
