@@ -31,6 +31,7 @@ options:
   trilium_oauth_client_secret: ""
   trilium_oauth_issuer_name: ""
   trilium_oauth_issuer_icon: ""
+  trilium_oauth_issuer_base: "" 
 schema:
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
@@ -56,6 +57,7 @@ environment:
   TRILIUM_OAUTH_CLIENT_SECRET: "{{ options.trilium_oauth_client_secret }}"
   TRILIUM_OAUTH_ISSUER_NAME: "{{ options.trilium_oauth_issuer_name }}"
   TRILIUM_OAUTH_ISSUER_ICON: "{{ options.trilium_oauth_issuer_icon }}"
+  TRILIUM_OAUTH_ISSUER_BASE_URL: "{{ options.trilium_oauth_issuer_base }}"
 
 # You can also set up through environment variables:
 # TRILIUM_OAUTH_BASE_URL, TRILIUM_OAUTH
