@@ -65,8 +65,11 @@ EOF
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
+        env:
+          INSTALL_VER: ${{ env.INSTALL_VER }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          echo "INSTALL_VER=$INSTALL_VER"
+          echo "Using INSTALL_VER=$INSTALL_VER"
 
           docker build \
             --build-arg ARCH=amd64 \
@@ -79,6 +82,3 @@ EOF
 
           docker push $DOCKERHUB_USERNAME/custom-omada:$INSTALL_VER
           docker push $DOCKERHUB_USERNAME/custom-omada:latest
-        env:
-          INSTALL_VER: ${{ env.INSTALL_VER }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
