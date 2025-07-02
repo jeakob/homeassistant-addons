@@ -49,6 +49,7 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
 
+          # Generate Dockerfile dynamically with the fetched version
           cat > homeassistant-addons/omada-controller/Dockerfile <<EOF
 FROM mbentley/ubuntu:20.04
 LABEL maintainer="Matt Bentley <matt@bentley.link>"
@@ -68,6 +69,7 @@ CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
 EOF
 
           echo "Dockerfile created successfully"
+          cat homeassistant-addons/omada-controller/Dockerfile
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
