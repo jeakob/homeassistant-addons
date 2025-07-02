@@ -1,4 +1,4 @@
-name: Build and Push Custom Omada Image
+name: Build and Push Custom Omada Image v2
 
 on:
   push:
