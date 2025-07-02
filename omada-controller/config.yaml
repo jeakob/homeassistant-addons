@@ -1,5 +1,5 @@
 ---
-name: Omada Controller Stable - JB
+name: Omada Controller Stable JB
 image: jeakob/custom-omada:latest
 version: 5.15.24.17
 slug: omada_controller
