@@ -69,6 +69,6 @@ jobs:
             --build-arg TARGETARCH=amd64 \
             --build-arg BUILD_ARCH=amd64 \
             --platform linux/amd64 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:$INSTALL_VER \
             ./homeassistant-addons/omada-controller
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest
