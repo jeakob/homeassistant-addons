@@ -33,60 +33,38 @@ jobs:
           echo "INSTALL_VER=$INSTALL_VER" >> $GITHUB_ENV
           echo "Using INSTALL_VER: $INSTALL_VER"
           
-          # Fetch missing scripts with error handling
+          # Function to fix line endings
+          fix_line_endings() {
+            file="$1"
+            if command -v dos2unix >/dev/null 2>&1; then
+              dos2unix "$file"
+            else
+              sed -i 's/\r$//' "$file"
+            fi
+          }
+
           echo "Fetching required scripts..."
-          
-          # Download and fix line endings for scripts
+
+          # Download and fix scripts
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
-          dos2unix homeassistant-addons/omada-controller/install.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/install.sh
           chmod +x homeassistant-addons/omada-controller/install.sh
+          fix_line_endings homeassistant-addons/omada-controller/install.sh
           
-          # Create our own entrypoint.sh to avoid download issues
-          cat > homeassistant-addons/omada-controller/entrypoint.sh << 'ENTRYPOINT_EOF'
-#!/bin/bash
-set -e
-
-echo "Starting Omada Controller entrypoint..."
-
-# Source the original entrypoint logic
-if [ -f /mbentley/entrypoint-5.x.sh ]; then
-    echo "Using mbentley entrypoint-5.x.sh"
-    exec /mbentley/entrypoint-5.x.sh "$@"
-else
-    echo "Fallback: Starting Java directly"
-    exec "$@"
-fi
-ENTRYPOINT_EOF
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
           chmod +x homeassistant-addons/omada-controller/entrypoint.sh
+          fix_line_endings homeassistant-addons/omada-controller/entrypoint.sh
           
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
-          dos2unix homeassistant-addons/omada-controller/healthcheck.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/healthcheck.sh
           chmod +x homeassistant-addons/omada-controller/healthcheck.sh
+          fix_line_endings homeassistant-addons/omada-controller/healthcheck.sh
           
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
-          dos2unix homeassistant-addons/omada-controller/mbentley/install.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/install.sh
           chmod +x homeassistant-addons/omada-controller/mbentley/install.sh
+          fix_line_endings homeassistant-addons/omada-controller/mbentley/install.sh
           
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
-          dos2unix homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
-          
-          # Verify our custom entrypoint script
-          echo "=== Custom entrypoint.sh content ==="
-          cat homeassistant-addons/omada-controller/entrypoint.sh
-          echo "=== entrypoint.sh first line ==="
-          head -1 homeassistant-addons/omada-controller/entrypoint.sh
-          echo "=== mbentley/entrypoint-5.x.sh first line ==="
-          head -1 homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
-          
-          # Verify file permissions and format
-          echo "=== File permissions ==="
-          ls -la homeassistant-addons/omada-controller/*.sh
-          ls -la homeassistant-addons/omada-controller/mbentley/*.sh
-          
-          # Check for binary content that might indicate corruption
-          echo "=== Checking for binary content in entrypoint.sh ==="
-          file homeassistant-addons/omada-controller/entrypoint.sh
+          fix_line_endings homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           
           # Generate Dockerfile dynamically with the fetched version
           cat > homeassistant-addons/omada-controller/Dockerfile << 'EOF'
@@ -99,7 +77,7 @@ ENTRYPOINT_EOF
           ARG BUILD_ARCH
           ARG ARCH=amd64
           ARG NO_MONGODB=false
-          RUN chmod +x /install.sh /entrypoint.sh /healthcheck.sh /mbentley/install.sh /mbentley/entrypoint-5.x.sh && /install.sh && rm -f /install.sh
+          RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
           WORKDIR /opt/tplink/EAPController/lib
           EXPOSE 29810/udp 29811 29812 29813
           VOLUME ["/data"]
@@ -123,10 +101,7 @@ ENTRYPOINT_EOF
         run: |
           echo "Building with INSTALL_VER=${INSTALL_VER}"
           
-          # Force Intel/AMD64 architecture for your Intel system
-          echo "Building for Intel x86_64 architecture"
-          
-          # Build the Docker image with explicit Intel platform
+          # Build the Docker image
           docker buildx build \
             --build-arg INSTALL_VER="${INSTALL_VER}" \
             --build-arg ARCH=amd64 \
@@ -135,15 +110,7 @@ ENTRYPOINT_EOF
             --platform linux/amd64 \
             --tag ${DOCKERHUB_USERNAME}/custom-omada:${INSTALL_VER} \
             --tag ${DOCKERHUB_USERNAME}/custom-omada:latest \
-            --load \
+            --push \
             ./homeassistant-addons/omada-controller
-          
-          # Test the image locally before pushing
-          echo "Testing image locally..."
-          docker run --rm --entrypoint /bin/bash ${DOCKERHUB_USERNAME}/custom-omada:latest -c "ls -la /entrypoint.sh && head -1 /entrypoint.sh"
-          
-          # Push the images
-          docker push ${DOCKERHUB_USERNAME}/custom-omada:${INSTALL_VER}
-          docker push ${DOCKERHUB_USERNAME}/custom-omada:latest
           
           echo "Build and push completed successfully"
