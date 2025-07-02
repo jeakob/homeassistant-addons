@@ -14,28 +14,49 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch upstream Dockerfile
-        run: |
-          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o homeassistant-addons/omada-controller/Dockerfile
-
-      - name: Fetch missing files from upstream repo
+      - name: Fetch upstream Dockerfile and missing files
+        id: fetch
         run: |
           mkdir -p homeassistant-addons/omada-controller/mbentley
+
+          # Fetch upstream Dockerfile
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
+
+          # Extract INSTALL_VER
+          INSTALL_VER=$(grep 'ARG INSTALL_VER=' Dockerfile.upstream | cut -d'"' -f2)
+          echo "INSTALL_VER=$INSTALL_VER" >> $GITHUB_ENV
+          echo "Using INSTALL_VER: $INSTALL_VER"
+
+          # Fetch missing scripts
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
 
-      - name: Enable debug mode in install.sh
-        run: sed -i '1i set -ex' homeassistant-addons/omada-controller/install.sh
+          # Generate Dockerfile
+          cat <<EOF > homeassistant-addons/omada-controller/Dockerfile
+FROM mbentley/ubuntu:20.04
 
-      - name: Extract version from Dockerfile
-        id: extract_version
-        run: |
-          VERSION=$(grep 'ARG INSTALL_VER=' homeassistant-addons/omada-controller/Dockerfile | head -n1 | cut -d= -f2 | tr -d '"')
-          echo "OMADA_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Detected version: $VERSION"
+LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"
+LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
+
+COPY ./ /
+
+ARG INSTALL_VER=$INSTALL_VER
+ARG TARGETARCH=amd64
+ARG BUILD_ARCH
+ARG ARCH=amd64
+ARG NO_MONGODB=false
+
+RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
+
+WORKDIR /opt/tplink/EAPController/lib
+EXPOSE 29810/udp 29811 29812 29813
+VOLUME ["/data"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
+EOF
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -45,6 +66,14 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          cd homeassistant-addons/omada-controller
-          docker build -t jeakob/custom-omada:${{ env.OMADA_VERSION }} .
-          docker push jeakob/custom-omada:${{ env.OMADA_VERSION }}
+          docker build \
+            --build-arg ARCH=amd64 \
+            --build-arg TARGETARCH=amd64 \
+            --build-arg BUILD_ARCH=amd64 \
+            --platform linux/amd64 \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:${{ env.INSTALL_VER }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest \
+            ./homeassistant-addons/omada-controller
+
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:${{ env.INSTALL_VER }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest
