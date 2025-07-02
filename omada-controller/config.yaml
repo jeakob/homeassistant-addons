@@ -1,6 +1,6 @@
 ---
 name: Omada Controller Stable JB
-image: jeakob/custom-omada:latest
+image: jeakob/custom-omada
 version: 5.15.24.17
 slug: omada_controller
 description: TP-Link Omada Controller software
