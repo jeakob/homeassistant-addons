@@ -53,37 +53,37 @@ jobs:
           chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           
           # Generate Dockerfile dynamically with the fetched version
-          cat > homeassistant-addons/omada-controller/Dockerfile << 'EOF'
-FROM mbentley/ubuntu:20.04
-
-LABEL maintainer="Matt Bentley <matt@bentley.link>"
-LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
-
-# Copy all files to root
-COPY ./ /
-
-# Set build arguments
-ARG INSTALL_VER
-ARG TARGETARCH=amd64
-ARG BUILD_ARCH
-ARG ARCH=amd64
-ARG NO_MONGODB=false
-
-# Install and cleanup
-RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
-
-WORKDIR /opt/tplink/EAPController/lib
-
-# Expose ports
-EXPOSE 29810/udp 29811 29812 29813
-
-# Set volume
-VOLUME ["/data"]
-
-# Set entrypoint and default command
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
-EOF
+          cat > homeassistant-addons/omada-controller/Dockerfile << 'DOCKERFILE_EOF'
+          FROM mbentley/ubuntu:20.04
+          
+          LABEL maintainer="Matt Bentley <matt@bentley.link>"
+          LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
+          
+          # Copy all files to root
+          COPY ./ /
+          
+          # Set build arguments
+          ARG INSTALL_VER
+          ARG TARGETARCH=amd64
+          ARG BUILD_ARCH
+          ARG ARCH=amd64
+          ARG NO_MONGODB=false
+          
+          # Install and cleanup
+          RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
+          
+          WORKDIR /opt/tplink/EAPController/lib
+          
+          # Expose ports
+          EXPOSE 29810/udp 29811 29812 29813
+          
+          # Set volume
+          VOLUME ["/data"]
+          
+          # Set entrypoint and default command
+          ENTRYPOINT ["/entrypoint.sh"]
+          CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
+          DOCKERFILE_EOF
           
           echo "Dockerfile created successfully"
           cat homeassistant-addons/omada-controller/Dockerfile
