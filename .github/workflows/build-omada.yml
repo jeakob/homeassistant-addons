@@ -14,42 +14,28 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch upstream Dockerfile and missing files
+      - name: Fetch upstream Dockerfile
+        run: |
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o homeassistant-addons/omada-controller/Dockerfile
+
+      - name: Fetch missing files from upstream repo
         run: |
           mkdir -p homeassistant-addons/omada-controller/mbentley
-
-          # Fetch upstream Dockerfile (for reference, not directly used)
-          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
-
-          # Fetch missing scripts
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
 
-          # Create customized Dockerfile line by line
-          echo 'FROM mbentley/ubuntu:20.04' > homeassistant-addons/omada-controller/Dockerfile
-          echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'LABEL maintainer="Matt Bentley <mbentley@mbentley.net>"' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"' >> homeassistant-addons/omada-controller/Dockerfile
-          echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'COPY ./ /' >> homeassistant-addons/omada-controller/Dockerfile
-          echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ARG INSTALL_VER=5.15.24.17' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ARG TARGETARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ARG BUILD_ARCH' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ARG ARCH=amd64' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ARG NO_MONGODB=false' >> homeassistant-addons/omada-controller/Dockerfile
-          echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          # Add comprehensive debug and URL validation
-          echo 'RUN chmod +x /install.sh && /install.sh && rm -f /install.sh' >> homeassistant-addons/omada-controller/Dockerfile
-          echo '' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'WORKDIR /opt/tplink/EAPController/lib' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'EXPOSE 29810/udp 29811 29812 29813' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'VOLUME ["/data"]' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'ENTRYPOINT ["/entrypoint.sh"]' >> homeassistant-addons/omada-controller/Dockerfile
-          echo 'CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]' >> homeassistant-addons/omada-controller/Dockerfile
+      - name: Enable debug mode in install.sh
+        run: sed -i '1i set -ex' homeassistant-addons/omada-controller/install.sh
+
+      - name: Extract version from Dockerfile
+        id: extract_version
+        run: |
+          VERSION=$(grep 'ARG INSTALL_VER=' homeassistant-addons/omada-controller/Dockerfile | head -n1 | cut -d= -f2 | tr -d '"')
+          echo "OMADA_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Detected version: $VERSION"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -59,11 +45,6 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build \
-            --build-arg ARCH=amd64 \
-            --build-arg TARGETARCH=amd64 \
-            --build-arg BUILD_ARCH=amd64 \
-            --platform linux/amd64 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest \
-            ./homeassistant-addons/omada-controller
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/custom-omada:latest
+          cd homeassistant-addons/omada-controller
+          docker build -t jeakob/custom-omada:${{ env.OMADA_VERSION }} .
+          docker push jeakob/custom-omada:${{ env.OMADA_VERSION }}
