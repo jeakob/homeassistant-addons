@@ -41,3 +41,9 @@ environment:
   NODE_ENV: "production"
   HOST: "0.0.0.0"
   TRILIUM_LOG_LEVEL: "{{ options.log_level }}"
+  TRILIUM_OAUTH_BASE_URL: ""  # You can set this via env var
+  TRILIUM_OAUTH_CLIENT_ID: ""  # You can set this via env var
+  TRILIUM_OAUTH_CLIENT_SECRET: ""  # You can set this via env var
+
+# You can also set up through environment variables:
+# TRILIUM_OAUTH_BASE_URL, TRILIUM_OAUTH_CLIENT_ID, and TRILIUM_OAUTH_CLIENT_SECRET
