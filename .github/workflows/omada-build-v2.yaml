@@ -1,4 +1,4 @@
-name: Build and Push Custom Omada Image v2
+name: Build and Push Custom Omada Image
 
 on:
   push:
@@ -9,7 +9,6 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -21,10 +20,10 @@ jobs:
         id: fetch
         run: |
           mkdir -p homeassistant-addons/omada-controller/mbentley
-
+          
           # Fetch upstream Dockerfile
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
-
+          
           # Extract INSTALL_VER from upstream Dockerfile (handle different formats)
           INSTALL_VER=$(grep 'ARG INSTALL_VER=' Dockerfile.upstream | sed 's/ARG INSTALL_VER=//g' | tr -d '"' | head -1)
           if [ -z "$INSTALL_VER" ]; then
@@ -33,25 +32,24 @@ jobs:
           fi
           echo "INSTALL_VER=$INSTALL_VER" >> $GITHUB_ENV
           echo "Using INSTALL_VER: $INSTALL_VER"
-
+          
           echo "Fetching required scripts..."
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
           chmod +x homeassistant-addons/omada-controller/install.sh
-
+          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
           chmod +x homeassistant-addons/omada-controller/entrypoint.sh
-
+          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
           chmod +x homeassistant-addons/omada-controller/healthcheck.sh
-
+          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
           chmod +x homeassistant-addons/omada-controller/mbentley/install.sh
-
+          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
-
-          # Create Dockerfile without indentation in heredoc
-          cat > homeassistant-addons/omada-controller/Dockerfile << 'EOF'
+          
+          cat > homeassistant-addons/omada-controller/Dockerfile <<EOF
 FROM mbentley/ubuntu:20.04
 LABEL maintainer="Matt Bentley <matt@bentley.link>"
 LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
@@ -68,7 +66,6 @@ VOLUME ["/data"]
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
 EOF
-
           echo "Dockerfile created successfully"
           cat homeassistant-addons/omada-controller/Dockerfile
 
@@ -84,6 +81,7 @@ EOF
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           echo "Building with INSTALL_VER=${INSTALL_VER}"
+          
           docker buildx build \
             --build-arg INSTALL_VER="${INSTALL_VER}" \
             --build-arg ARCH=amd64 \
@@ -94,5 +92,5 @@ EOF
             --tag ${DOCKERHUB_USERNAME}/custom-omada:latest \
             --push \
             ./homeassistant-addons/omada-controller
-
+          
           echo "Build and push completed successfully"
