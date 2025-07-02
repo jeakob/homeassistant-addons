@@ -1,6 +1,6 @@
 ---
 name: Omada Controller Stable - JB
-image: jeruntu/home-assistant-omada-stable
+image: jeakob/custom-omada:latest
 version: 5.15.24.17
 slug: omada_controller_stable
 description: TP-Link Omada Controller software
@@ -10,7 +10,7 @@ arch:
   - aarch64
   - amd64
 init: false
-url: https://github.com/jkunczik/home-assistant-omada
+url: https://github.com/jeakob/omada-controller
 map:
   - ssl
 options:
