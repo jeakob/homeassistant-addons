@@ -26,12 +26,12 @@ options:
   timezone: "Europe/Berlin"
   log_level: "info"
   https_only: false
-  trilium_oauth_base_url: ""
+  trilium_oauth_base_url: "https://notepad2.jeak0b.duckdns.org"
   trilium_oauth_client_id: ""
   trilium_oauth_client_secret: ""
   trilium_oauth_issuer_name: ""
   trilium_oauth_issuer_icon: ""
-  trilium_oauth_issuer_base: "" 
+  trilium_oauth_issuer_base: "https://auth.jeakob.giize.com/application/o/trill-rpi/" 
 schema:
   timezone: |
     list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
