@@ -1,0 +1,134 @@
+name: Build and Push Custom Omada Image v2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Fetch upstream Dockerfile and missing files
+        id: fetch
+        run: |
+          mkdir -p homeassistant-addons/omada-controller/mbentley
+          
+          # Fetch upstream Dockerfile
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/Dockerfile.v5.x -o Dockerfile.upstream
+          
+          # Extract INSTALL_VER from upstream Dockerfile (handle different formats)
+          INSTALL_VER=$(grep 'ARG INSTALL_VER=' Dockerfile.upstream | sed 's/ARG INSTALL_VER=//g' | tr -d '"' | head -1)
+          if [ -z "$INSTALL_VER" ]; then
+            echo "Could not extract INSTALL_VER, using default"
+            INSTALL_VER="5.13.30.8"
+          fi
+          echo "INSTALL_VER=$INSTALL_VER" >> $GITHUB_ENV
+          echo "Using INSTALL_VER: $INSTALL_VER"
+          
+          # Fetch missing scripts with error handling
+          echo "Fetching required scripts..."
+          
+          # Download and fix line endings for scripts
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
+          dos2unix homeassistant-addons/omada-controller/install.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/install.sh
+          chmod +x homeassistant-addons/omada-controller/install.sh
+          
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
+          dos2unix homeassistant-addons/omada-controller/entrypoint.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/entrypoint.sh
+          chmod +x homeassistant-addons/omada-controller/entrypoint.sh
+          
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
+          dos2unix homeassistant-addons/omada-controller/healthcheck.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/healthcheck.sh
+          chmod +x homeassistant-addons/omada-controller/healthcheck.sh
+          
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
+          dos2unix homeassistant-addons/omada-controller/mbentley/install.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/install.sh
+          chmod +x homeassistant-addons/omada-controller/mbentley/install.sh
+          
+          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+          dos2unix homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+          chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+          
+          # Verify shebang lines exist in entrypoint scripts
+          echo "Checking entrypoint scripts..."
+          echo "=== entrypoint.sh first line ==="
+          head -1 homeassistant-addons/omada-controller/entrypoint.sh
+          echo "=== mbentley/entrypoint-5.x.sh first line ==="
+          head -1 homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+          
+          # Verify file permissions and format
+          echo "=== File permissions ==="
+          ls -la homeassistant-addons/omada-controller/*.sh
+          ls -la homeassistant-addons/omada-controller/mbentley/*.sh
+          
+          # Check for binary content that might indicate corruption
+          echo "=== Checking for binary content in entrypoint.sh ==="
+          file homeassistant-addons/omada-controller/entrypoint.sh
+          
+          # Generate Dockerfile dynamically with the fetched version
+          cat > homeassistant-addons/omada-controller/Dockerfile << 'EOF'
+          FROM mbentley/ubuntu:20.04
+          LABEL maintainer="Matt Bentley <matt@bentley.link>"
+          LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
+          COPY ./ /
+          ARG INSTALL_VER
+          ARG TARGETARCH=amd64
+          ARG BUILD_ARCH
+          ARG ARCH=amd64
+          ARG NO_MONGODB=false
+          RUN chmod +x /install.sh /entrypoint.sh /healthcheck.sh /mbentley/install.sh /mbentley/entrypoint-5.x.sh && /install.sh && rm -f /install.sh
+          WORKDIR /opt/tplink/EAPController/lib
+          EXPOSE 29810/udp 29811 29812 29813
+          VOLUME ["/data"]
+          ENTRYPOINT ["/entrypoint.sh"]
+          CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
+          EOF
+          
+          echo "Dockerfile created successfully"
+          cat homeassistant-addons/omada-controller/Dockerfile
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        env:
+          INSTALL_VER: ${{ env.INSTALL_VER }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          echo "Building with INSTALL_VER=${INSTALL_VER}"
+          
+          # Force Intel/AMD64 architecture for your Intel system
+          echo "Building for Intel x86_64 architecture"
+          
+          # Build the Docker image with explicit Intel platform
+          docker buildx build \
+            --build-arg INSTALL_VER="${INSTALL_VER}" \
+            --build-arg ARCH=amd64 \
+            --build-arg TARGETARCH=amd64 \
+            --build-arg BUILD_ARCH=amd64 \
+            --platform linux/amd64 \
+            --tag ${DOCKERHUB_USERNAME}/custom-omada:${INSTALL_VER} \
+            --tag ${DOCKERHUB_USERNAME}/custom-omada:latest \
+            --load \
+            ./homeassistant-addons/omada-controller
+          
+          # Test the image locally before pushing
+          echo "Testing image locally..."
+          docker run --rm --entrypoint /bin/bash ${DOCKERHUB_USERNAME}/custom-omada:latest -c "ls -la /entrypoint.sh && head -1 /entrypoint.sh"
+          
+          # Push the images
+          docker push ${DOCKERHUB_USERNAME}/custom-omada:${INSTALL_VER}
+          docker push ${DOCKERHUB_USERNAME}/custom-omada:latest
+          
+          echo "Build and push completed successfully"
