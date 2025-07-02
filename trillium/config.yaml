@@ -42,6 +42,7 @@ schema:
   trilium_oauth_client_secret: "str?"
   trilium_oauth_issuer_name: "str?"
   trilium_oauth_issuer_icon: "str?"
+  trilium_oauth_issuer_base: "str?"
 environment:
   TRILIUM_DATA_DIR: "/data/trilium-data"  # Use /data for persistent data storage
   USER_UID: "1000"
