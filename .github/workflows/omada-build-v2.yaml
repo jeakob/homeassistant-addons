@@ -33,57 +33,55 @@ jobs:
           echo "INSTALL_VER=$INSTALL_VER" >> $GITHUB_ENV
           echo "Using INSTALL_VER: $INSTALL_VER"
           
-          # Function to fix line endings
-          fix_line_endings() {
-            file="$1"
-            if command -v dos2unix >/dev/null 2>&1; then
-              dos2unix "$file"
-            else
-              sed -i 's/\r$//' "$file"
-            fi
-          }
-
+          # Fetch missing scripts with error handling
           echo "Fetching required scripts..."
-
-          # Download and fix scripts
+          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/install.sh -o homeassistant-addons/omada-controller/install.sh
-          chmod +x homeassistant-addons/omada-controller/install.sh
-          fix_line_endings homeassistant-addons/omada-controller/install.sh
-          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
-          chmod +x homeassistant-addons/omada-controller/entrypoint.sh
-          fix_line_endings homeassistant-addons/omada-controller/entrypoint.sh
-          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
-          chmod +x homeassistant-addons/omada-controller/healthcheck.sh
-          fix_line_endings homeassistant-addons/omada-controller/healthcheck.sh
-          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/install.sh -o homeassistant-addons/omada-controller/mbentley/install.sh
-          chmod +x homeassistant-addons/omada-controller/mbentley/install.sh
-          fix_line_endings homeassistant-addons/omada-controller/mbentley/install.sh
-          
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/mbentley/entrypoint-5.x.sh -o homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
-          chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
-          fix_line_endings homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           
-          # Generate Dockerfile dynamically with the fetched version
+          # Make scripts executable and fix line endings just in case
+          chmod +x homeassistant-addons/omada-controller/install.sh
+          chmod +x homeassistant-addons/omada-controller/entrypoint.sh
+          chmod +x homeassistant-addons/omada-controller/healthcheck.sh
+          chmod +x homeassistant-addons/omada-controller/mbentley/install.sh
+          chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+
+          # Fix potential Windows line endings
+          sed -i 's/\r$//' homeassistant-addons/omada-controller/install.sh
+          sed -i 's/\r$//' homeassistant-addons/omada-controller/entrypoint.sh
+          sed -i 's/\r$//' homeassistant-addons/omada-controller/healthcheck.sh
+          sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/install.sh
+          sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
+          
+          # Generate Dockerfile dynamically with explicit COPY commands
           cat > homeassistant-addons/omada-controller/Dockerfile << 'EOF'
-          FROM mbentley/ubuntu:20.04
-          LABEL maintainer="Matt Bentley <matt@bentley.link>"
-          LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
-          COPY ./ /
-          ARG INSTALL_VER
-          ARG TARGETARCH=amd64
-          ARG BUILD_ARCH
-          ARG ARCH=amd64
-          ARG NO_MONGODB=false
-          RUN chmod +x /install.sh && /install.sh && rm -f /install.sh
-          WORKDIR /opt/tplink/EAPController/lib
-          EXPOSE 29810/udp 29811 29812 29813
-          VOLUME ["/data"]
-          ENTRYPOINT ["/entrypoint.sh"]
-          CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
-          EOF
+FROM mbentley/ubuntu:20.04
+LABEL maintainer="Matt Bentley <matt@bentley.link>"
+LABEL org.opencontainers.image.source="https://github.com/mbentley/docker-omada-controller"
+
+COPY healthcheck.sh install.sh /
+COPY mbentley/install.sh /mbentley/
+COPY entrypoint.sh /
+COPY mbentley/entrypoint-5.x.sh /mbentley/
+
+ARG INSTALL_VER
+ARG TARGETARCH=amd64
+ARG BUILD_ARCH
+ARG ARCH=amd64
+ARG NO_MONGODB=false
+
+RUN chmod +x /install.sh /entrypoint.sh /mbentley/install.sh /mbentley/entrypoint-5.x.sh && \
+    /install.sh && rm -f /install.sh
+
+WORKDIR /opt/tplink/EAPController/lib
+EXPOSE 29810/udp 29811 29812 29813
+VOLUME ["/data"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/usr/bin/java", "-server", "-Xms128m", "-Xmx1024m"]
+EOF
           
           echo "Dockerfile created successfully"
           cat homeassistant-addons/omada-controller/Dockerfile
@@ -101,7 +99,6 @@ jobs:
         run: |
           echo "Building with INSTALL_VER=${INSTALL_VER}"
           
-          # Build the Docker image
           docker buildx build \
             --build-arg INSTALL_VER="${INSTALL_VER}" \
             --build-arg ARCH=amd64 \
