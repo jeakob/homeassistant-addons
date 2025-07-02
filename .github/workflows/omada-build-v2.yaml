@@ -41,8 +41,22 @@ jobs:
           dos2unix homeassistant-addons/omada-controller/install.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/install.sh
           chmod +x homeassistant-addons/omada-controller/install.sh
           
-          curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/entrypoint.sh -o homeassistant-addons/omada-controller/entrypoint.sh
-          dos2unix homeassistant-addons/omada-controller/entrypoint.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/entrypoint.sh
+          # Create our own entrypoint.sh to avoid download issues
+          cat > homeassistant-addons/omada-controller/entrypoint.sh << 'ENTRYPOINT_EOF'
+#!/bin/bash
+set -e
+
+echo "Starting Omada Controller entrypoint..."
+
+# Source the original entrypoint logic
+if [ -f /mbentley/entrypoint-5.x.sh ]; then
+    echo "Using mbentley entrypoint-5.x.sh"
+    exec /mbentley/entrypoint-5.x.sh "$@"
+else
+    echo "Fallback: Starting Java directly"
+    exec "$@"
+fi
+ENTRYPOINT_EOF
           chmod +x homeassistant-addons/omada-controller/entrypoint.sh
           
           curl -sSL https://raw.githubusercontent.com/mbentley/docker-omada-controller/master/healthcheck.sh -o homeassistant-addons/omada-controller/healthcheck.sh
@@ -57,8 +71,9 @@ jobs:
           dos2unix homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh 2>/dev/null || sed -i 's/\r$//' homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           chmod +x homeassistant-addons/omada-controller/mbentley/entrypoint-5.x.sh
           
-          # Verify shebang lines exist in entrypoint scripts
-          echo "Checking entrypoint scripts..."
+          # Verify our custom entrypoint script
+          echo "=== Custom entrypoint.sh content ==="
+          cat homeassistant-addons/omada-controller/entrypoint.sh
           echo "=== entrypoint.sh first line ==="
           head -1 homeassistant-addons/omada-controller/entrypoint.sh
           echo "=== mbentley/entrypoint-5.x.sh first line ==="
