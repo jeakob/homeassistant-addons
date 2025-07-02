@@ -2,7 +2,7 @@
 name: Omada Controller Stable - JB
 image: jeakob/custom-omada:latest
 version: 5.15.24.17
-slug: omada_controller_stable
+slug: omada-controller
 description: TP-Link Omada Controller software
 webui: https://[HOST]:[PORT:8043]
 startup: application
