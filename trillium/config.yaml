@@ -41,4 +41,4 @@ environment:
   NODE_ENV: "production"
   HOST: "0.0.0.0"
   # Let Trilium use its default configuration
-  TRILIUM_CONFIG_INI_PATH: "/data/trilium-data/trilium-config.json"
+  TRILIUM_CONFIG_INI_PATH: "/data/trilium-data/trilium-config.ini"
