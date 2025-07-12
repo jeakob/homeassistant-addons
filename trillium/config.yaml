@@ -47,24 +47,14 @@ schema:
 environment:
   # Minimal environment variables
   TRILIUM_DATA_DIR: "/data/trilium-data"
-  TZ: "{{ options.timezone }}"
+  TZ: "{{ .timezone }}"
   NODE_ENV: "production"
   HOST: "0.0.0.0"
   # Let Trilium use its default configuration
   TRILIUM_CONFIG_INI_PATH: "/data/trilium-data/trilium-config.ini"
-  # OAuth configuration (only set if values are provided)
-  {% if options.oauth_base_url %}
-  TRILIUM_OAUTH_BASE_URL: "{{ options.oauth_base_url }}"
-  {% endif %}
-  {% if options.oauth_client_id %}
-  TRILIUM_OAUTH_CLIENT_ID: "{{ options.oauth_client_id }}"
-  {% endif %}
-  {% if options.oauth_client_secret %}
-  TRILIUM_OAUTH_CLIENT_SECRET: "{{ options.oauth_client_secret }}"
-  {% endif %}
-  {% if options.oauth_issuer_base_url %}
-  TRILIUM_OAUTH_ISSUER_BASE_URL: "{{ options.oauth_issuer_base_url }}"
-  {% endif %}
-  {% if options.oauth_issuer_name %}
-  TRILIUM_OAUTH_ISSUER_NAME: "{{ options.oauth_issuer_name }}"
-  {% endif %}
+  # OAuth configuration (optional)
+  TRILIUM_OAUTH_BASE_URL: "{{ .oauth_base_url }}"
+  TRILIUM_OAUTH_CLIENT_ID: "{{ .oauth_client_id }}"
+  TRILIUM_OAUTH_CLIENT_SECRET: "{{ .oauth_client_secret }}"
+  TRILIUM_OAUTH_ISSUER_BASE_URL: "{{ .oauth_issuer_base_url }}"
+  TRILIUM_OAUTH_ISSUER_NAME: "{{ .oauth_issuer_name }}"
