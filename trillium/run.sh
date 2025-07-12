@@ -33,12 +33,30 @@ export TRILIUM_OAUTH_ISSUER_BASE_URL="${OAUTH_ISSUER_BASE_URL}"
 export TRILIUM_OAUTH_ISSUER_NAME="${OAUTH_ISSUER_NAME}"
 export TRILIUM_OAUTH_ISSUER_ICON="${OAUTH_ISSUER_ICON}"
 
-# Debug: print OAuth vars except secret (for safety)
-echo "OAuth Base URL: $TRILIUM_OAUTH_BASE_URL"
-echo "OAuth Client ID: $TRILIUM_OAUTH_CLIENT_ID"
-echo "OAuth Issuer Base URL: $TRILIUM_OAUTH_ISSUER_BASE_URL"
-echo "OAuth Issuer Name: $TRILIUM_OAUTH_ISSUER_NAME"
-echo "OAuth Issuer Icon: $TRILIUM_OAUTH_ISSUER_ICON"
+# Generate or overwrite config.ini with OAuth settings
+CONFIG_FILE="/data/trilium-data/config.ini"
+cat > "${CONFIG_FILE}" <<EOF
+[oauth]
+# Public URL of your Trilium instance
+oauthBaseUrl=${TRILIUM_OAUTH_BASE_URL}
+
+# OAuth/OpenID Connect client credentials
+oauthClientId=${TRILIUM_OAUTH_CLIENT_ID}
+oauthClientSecret=${TRILIUM_OAUTH_CLIENT_SECRET}
+
+# Issuer (Authentik/OpenID provider) — must NOT include .well-known suffix
+oauthIssuerBaseUrl=${TRILIUM_OAUTH_ISSUER_BASE_URL}
+oauthIssuerName=${TRILIUM_OAUTH_ISSUER_NAME}
+oauthIssuerIcon=${TRILIUM_OAUTH_ISSUER_ICON}
+
+# You can adjust these defaults if needed
+oauthScope=openid profile email
+oauthResponseType=code
+oauthCallbackUrl=${TRILIUM_OAUTH_BASE_URL}/oauth/callback
+oauthRedirectUri=${TRILIUM_OAUTH_BASE_URL}/oauth/callback
+EOF
+
+echo "Wrote OAuth settings to ${CONFIG_FILE}"
 
 # Debug: Show directory permissions
 echo "Directory permissions for /data:"
