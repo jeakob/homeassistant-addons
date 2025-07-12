@@ -1,4 +1,3 @@
----
 name: "TriliumNext Notes"
 version: "v0.96.0"
 slug: trilium_next
@@ -13,6 +12,7 @@ arch:
 startup: application
 boot: auto
 init: false
+command: ./run.sh
 map:
   - type: data
     read_only: false
@@ -24,24 +24,38 @@ options:
   timezone: "Europe/Berlin"
   log_level: "info"
   https_only: false
-  oauth_base_url: ""
-  oauth_client_id: ""
-  oauth_client_secret: ""
-  oauth_issuer_base_url: ""
-  oauth_issuer_name: "Google"
-  oauth_issuer_icon: ""
+  oauth_base_url: "https://trilium.domain.com"
+  oauth_client_id: "CLIENTID"
+  oauth_client_secret: "CLIENTSECRET"
+  oauth_issuer_base_url: "https://auth.domain.com/application/o/trilium/.well-known/openid-configuration"
+  oauth_issuer_name: "Authentik"
+  oauth_issuer_icon: "https://auth.domain.com/media/logo.png"
+schema:
+  timezone: 
+    - Europe/Berlin
+    - America/New_York
+    - UTC
+    - Asia/Berlin
+    - Europe/London
+    - Asia/Tokyo
+    - Australia/Sydney
+  log_level: 
+    - trace
+    - debug
+    - info
+    - notice
+    - warning
+    - error
+    - fatal
+  https_only: bool
+  oauth_base_url: str
+  oauth_client_id: str
+  oauth_client_secret: str
+  oauth_issuer_base_url: str
+  oauth_issuer_name: str
+  oauth_issuer_icon: str
 panel_icon: mdi:notebook-multiple
 panel_title: Trilium
 webui: "http://[HOST]:[PORT:8080]/"
 ports:
   "8080/tcp": 8080
-schema:
-  timezone: list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
-  log_level: list(trace|debug|info|notice|warning|error|fatal)
-  https_only: bool
-  oauth_base_url: str?
-  oauth_client_id: str?
-  oauth_client_secret: str?
-  oauth_issuer_base_url: str?
-  oauth_issuer_name: str?
-  oauth_issuer_icon: str?
