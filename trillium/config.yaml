@@ -7,9 +7,6 @@ url: "https://github.com/triliumnext/trilium"
 ingress: true
 ingress_port: 8080
 ingress_stream: true
-panel_icon: mdi:notebook-multiple
-panel_title: Trilium
-webui: "http://[HOST]:[PORT:8080]/"
 arch:
   - amd64
   - aarch64
@@ -23,8 +20,6 @@ map:
   - type: config
     read_only: false
     path: /config
-ports:
-  "8080/tcp": 8080
 options:
   timezone: "Europe/Berlin"
   log_level: "info"
@@ -33,28 +28,20 @@ options:
   oauth_client_id: ""
   oauth_client_secret: ""
   oauth_issuer_base_url: ""
-  oauth_issuer_name: ""
+  oauth_issuer_name: "Google"
+  oauth_issuer_icon: ""
+panel_icon: mdi:notebook-multiple
+panel_title: Trilium
+webui: "http://[HOST]:[PORT:8080]/"
+ports:
+  "8080/tcp": 8080
 schema:
-  timezone: |
-    list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
-  log_level: "list(trace|debug|info|notice|warning|error|fatal)"
-  https_only: "bool"
-  oauth_base_url: "str?"
-  oauth_client_id: "str?"
-  oauth_client_secret: "str?"
-  oauth_issuer_base_url: "str?"
-  oauth_issuer_name: "str?"
-environment:
-  # Minimal environment variables
-  TRILIUM_DATA_DIR: "/data/trilium-data"
-  TZ: "{{ .timezone }}"
-  NODE_ENV: "production"
-  HOST: "0.0.0.0"
-  # Let Trilium use its default configuration
-  TRILIUM_CONFIG_INI_PATH: "/data/trilium-data/trilium-config.ini"
-  # OAuth configuration (optional)
-  TRILIUM_OAUTH_BASE_URL: "{{ .oauth_base_url }}"
-  TRILIUM_OAUTH_CLIENT_ID: "{{ .oauth_client_id }}"
-  TRILIUM_OAUTH_CLIENT_SECRET: "{{ .oauth_client_secret }}"
-  TRILIUM_OAUTH_ISSUER_BASE_URL: "{{ .oauth_issuer_base_url }}"
-  TRILIUM_OAUTH_ISSUER_NAME: "{{ .oauth_issuer_name }}"
+  timezone: list(Europe/Berlin|America/New_York|UTC|Asia/Berlin|Europe/London|Asia/Tokyo|Australia/Sydney)
+  log_level: list(trace|debug|info|notice|warning|error|fatal)
+  https_only: bool
+  oauth_base_url: str?
+  oauth_client_id: str?
+  oauth_client_secret: str?
+  oauth_issuer_base_url: str?
+  oauth_issuer_name: str?
+  oauth_issuer_icon: str?
