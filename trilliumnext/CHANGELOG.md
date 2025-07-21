@@ -1,52 +1,71 @@
-> [!NOTE]
-> The Docker image has been relocated to . Please update your configuration accordingly.
-
 > [!CAUTION]
-> The Windows versions are not signed. If this is an issue, simply wait until we fix this issue.
+> **Important Security Update**
+> 
+> This release addresses a security vulnerability that could make password-based attacks against your Trilium instance more feasible. We strongly recommend upgrading to this version as soon as possible, especially if your Trilium server is accessible over a network.
+> 
+> For more details about this security fix, please see our published security advisory which will be available 14 days after this release.
 
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
-> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
+> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Notes) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
 ## 💡 Key highlights
 
-*   Thanks to a partnership with CKEditor, we now have a set of features that would otherwise be available on a commercial license only.
-    *   Slash commands for easy commands via the keyboard.
-    *   Text snippets to insert reusable pieces of text (similar to templates, but for blocks of text content).
-    *   For more information, see the user guide → Note Types → Text → Premium features.
+*   “Books” have been renamed to Collections to better match their intentions.
+    *   **A new collection was introduced,** _**table.**_
+        *   See the in-app documentation for more information.
+        *   Custom table theme for Trilium by @adoriandoran
+    *   Geomap: The geomap was converted from a standalone note type to a collection.
+    *   The collections are not displayed directly in “Insert child” in the note tree with predefined configuration such as promoted attributes to make them easier to use (e.g. for calendar, geomap).
+*   A new editing mechanism was introduced: quick edit. This opens notes for editing in a popup instead of a tab, allowing easy access. This is especially useful for collections, to edit notes without switching context.
 
 ## 🐞 Bugfixes
 
-*   [“Insert note after” long-press dialog doesn’t create Note](https://github.com/TriliumNext/Notes/issues/2246)
-*   Code notes: user's font selection not respected.
-*   [Windows V0.95.0 Client Failed to sync with server (use of double-slashes)](https://github.com/TriliumNext/Notes/issues/2339) by @perfectra1n
-*   Desktop client not working on older Linux distros
-*   [NOT NULL constraint failed: revisions.title when saving an empty note](https://github.com/TriliumNext/Trilium/issues/6103)
+*   [Missing note meta. Can't export empty note and involved note tree](https://github.com/TriliumNext/Trilium/issues/6146)
+*   [Mermaid notes sluggish](https://github.com/TriliumNext/Trilium/issues/5805)
+*   [In-app help confusing due to ligatures](https://github.com/TriliumNext/Trilium/issues/6224)
+*   Geo map: tooltip not showing.
+*   [Nix flake support broke with electron 37 upgrade](https://github.com/TriliumNext/Trilium/issues/6217)
+*   Signing on Windows did not work on the previous release.
+*   [When editing a note in Linux, middle-clicking a note title in tree pane triggers a paste action](https://github.com/TriliumNext/Trilium/issues/5812)
+*   Editor not focused after switching tabs.
+*   PDF file preview: inconvenient 10px scrollable margin at the bottom.
+*   Calendar view:
+    *   Subtree children not displayed when in calendar root.
+    *   Title changes to events not reflected.
+*   [Attributes Dialogue Doesn't Display for existing attributes](https://github.com/TriliumNext/Trilium/issues/5718)
+*   [Issues on Prometeus dashboard due to timestamps](https://github.com/TriliumNext/Trilium/issues/6354)
+*   [Ckeditor (re)-creation likely causes important lagging when coming from code note](https://github.com/TriliumNext/Trilium/issues/6367)
 
 ## ✨ Improvements
 
-*   [Elixir language syntax highlighting for text notes](https://github.com/TriliumNext/Notes/pull/2327) (by @jshprentz) and code notes.
-*   [Autocomplete: support specifying path when creating a new note](https://github.com/TriliumNext/Notes/pull/2342) by @SiriusXT
-*   Markdown import: basic support for importing wikilinks
-*   Text notes:
-    *   Allow disabling emoji auto-completion from settings.
-    *   Allow disabling note auto-completion from settings.
-*   [Backend scripts: re-enable dayjs plugins by default](https://github.com/TriliumNext/Trilium/issues/6080)
+*   Export to ZIP:
+    *   Improve error handling
+    *   Improve handling of notes with empty title.
+*   Tree context menu: reorder the note types of “Insert (child) note...” by @adoriandoran
+*   [Note map: add attributes to include or exclude relations](https://github.com/TriliumNext/Trilium/pull/6104) by @kieranknowles1
+*   [iframe sandbox allow popups](https://github.com/TriliumNext/Trilium/issues/5698)
+*   [Badges for the note type context menu](https://github.com/TriliumNext/Trilium/pull/6229) by @adoriandoran
+*   The “Book/Collection Properties" ribbon tab no longer focuses automatically.
+*   Geomap improvements:
+    *   Geolocation now displayed in the context menu.
+    *   Context menu for empty spaces on the map, for quickly viewing the location or adding a new marker.
+    *   Adding markers by drag & dropping from note tree.
+    *   Read-only mode to prevent modification such as dragging.
+    *   Calendar View: Added options to hide weekends & display week numbers directly from the “Collection Properties” in the ribbon.
+*   [Tree Context Menu: relocate the "Duplicate subtree" menu item](https://github.com/TriliumNext/Trilium/pull/6299) by @adoriandoran
 
 ## 📖 Documentation
 
-*   [regex search / Nix flake / restore dev docs](https://github.com/TriliumNext/Notes/pull/2341) by @FliegendeWurst
-*   New premium features in text note type.
-
-## 🌍 Internationalization
-
-*   Spanish improvements by @hasecilu
+*   New features, table.
+*   Updated collections.
+*   Keyboard shortcuts for the note tree.
 
 ## 🛠️ Technical updates
 
-*   flake: fix Electron version, fix Wayland support, fix source filter by @FliegendeWurst
-*   Improvements to the landing page (under development) by @FliegendeWurst
-*   Updated Node.js to v22.17.0
-*   Updated CKEditor to v45.2.1
+*   Updated to Electron 37.2.2.
+*   Mindmap dependency (MindElixir) was updated to the latest major version.
+*   Mermaid diagrams updated to the latest version (new diagram type tree map supported).
+*   CKEditor updated to latest major version (46).
