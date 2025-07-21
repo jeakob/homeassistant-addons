@@ -78,9 +78,9 @@ jobs:
             exit 1
           fi
           
-          # Also check the root config.yaml version
-          if [ -f "config.yaml" ]; then
-            CONFIG_VERSION=$(grep "version:" config.yaml | sed 's/.*version: *"\([^"]*\)".*/\1/')
+          # Check the trillium config.yaml version
+          if [ -f "$ADDON_DIR/config.yaml" ]; then
+            CONFIG_VERSION=$(jq -r '.version' "$ADDON_DIR/config.yaml")
             echo "Versions found:"
             echo "  updater.json: $CURRENT_VERSION"
             echo "  config.yaml: $CONFIG_VERSION"
@@ -93,12 +93,23 @@ jobs:
               NEEDS_UPDATE=false
             fi
           else
-            echo "config.yaml not found, only checking updater.json"
+            echo "trillium/config.yaml not found, only checking updater.json"
             echo "Current: $CURRENT_VERSION | Latest: $LATEST_VERSION"
             if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
               NEEDS_UPDATE=true
             else
               NEEDS_UPDATE=false
+            fi
+          fi
+          
+          # Also check if root config.yaml exists and needs updating
+          ROOT_CONFIG_NEEDS_UPDATE=false
+          if [ -f "config.yaml" ]; then
+            ROOT_CONFIG_VERSION=$(grep "version:" config.yaml | sed 's/.*version: *"\([^"]*\)".*/\1/')
+            echo "  root config.yaml: $ROOT_CONFIG_VERSION"
+            if [ "$LATEST_VERSION" != "$ROOT_CONFIG_VERSION" ]; then
+              ROOT_CONFIG_NEEDS_UPDATE=true
+              NEEDS_UPDATE=true
             fi
           fi
           
@@ -111,17 +122,16 @@ jobs:
               '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp.json && \
               mv tmp.json "$ADDON_DIR/updater.json"
             
-            echo "Updating config.yaml..."
+            echo "Updating trillium/config.yaml..."
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.yaml" > tmp.json && \
               mv tmp.json "$ADDON_DIR/config.yaml"
             
-            echo "Updating root config.yaml..."
-            if [ -f "config.yaml" ]; then
+            # Update root config.yaml if it exists
+            if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
+              echo "Updating root config.yaml..."
               sed -i "s/version: \".*\"/version: \"$LATEST_VERSION\"/" config.yaml
               echo "Root config.yaml updated"
-            else
-              echo "Warning: Root config.yaml not found"
             fi
             
             echo "Updating README.md..."
@@ -151,7 +161,16 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
-            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.yaml" "$ADDON_DIR/CHANGELOG.md" "config.yaml" "README.md"
+            # Add files that exist and were modified
+            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.yaml" "$ADDON_DIR/CHANGELOG.md"
+            
+            if [ -f "config.yaml" ]; then
+              git add "config.yaml"
+            fi
+            
+            if [ -f "README.md" ]; then
+              git add "README.md"
+            fi
             
             if git diff --staged --quiet; then
               echo "No changes detected after update"
@@ -160,9 +179,7 @@ jobs:
               git commit -m "Update to upstream version $LATEST_VERSION" \
                          -m "Updated files:" \
                          -m "- updater.json: upstream_version -> $LATEST_VERSION" \
-                         -m "- config.yaml: version -> $LATEST_VERSION" \
-                         -m "- config.yaml: version -> $LATEST_VERSION" \
-                         -m "- README.md: version -> $LATEST_VERSION" \
+                         -m "- trillium/config.yaml: version -> $LATEST_VERSION" \
                          -m "- CHANGELOG.md: Updated with latest release notes" \
                          -m "[skip ci]"
               
