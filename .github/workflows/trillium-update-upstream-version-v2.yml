@@ -141,17 +141,33 @@ jobs:
             
             echo "Updating README.md..."
             if [ -f "README.md" ]; then
-              # Update the version in the README title line
-              sed -i "s/Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Version: $LATEST_VERSION/" README.md
-              echo "README.md updated"
+              echo "Before update - Current README version line:"
+              grep -n "Version:" README.md || echo "No 'Version:' line found"
+              
+              # Try multiple patterns to match different version formats
+              # Pattern 1: Version: v0.96.0 (your current format)
+              sed -i 's/Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Version: '"$LATEST_VERSION"'/g' README.md
+              
+              # Pattern 2: Version: 0.96.0 (without v prefix)
+              sed -i 's/Version: [0-9]\+\.[0-9]\+\.[0-9]\+/Version: '"$LATEST_VERSION"'/g' README.md
+              
+              # Pattern 3: version: v0.96.0 (lowercase)
+              sed -i 's/version: v[0-9]\+\.[0-9]\+\.[0-9]\+/version: '"$LATEST_VERSION"'/g' README.md
+              
+              # Pattern 4: version: 0.96.0 (lowercase, no v)
+              sed -i 's/version: [0-9]\+\.[0-9]\+\.[0-9]\+/version: '"$LATEST_VERSION"'/g' README.md
+              
+              echo "After update - Updated README version line:"
+              grep -n "Version:\|version:" README.md || echo "No version line found"
               
               # Verify the update worked
-              if grep -q "Version: $LATEST_VERSION" README.md; then
+              if grep -q "$LATEST_VERSION" README.md; then
                 echo "✅ README.md version successfully updated to $LATEST_VERSION"
               else
                 echo "⚠️  WARNING: README.md may not have been updated correctly"
-                echo "Current README version line:"
-                grep "Version:" README.md || echo "No 'Version:' line found in README.md"
+                echo "Expected version: $LATEST_VERSION"
+                echo "README content around version:"
+                grep -B2 -A2 -i "version\|trilium" README.md || echo "Could not find version context"
               fi
             else
               echo "Warning: README.md not found"
