@@ -6,7 +6,7 @@
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * *' # every day at 6:00 UTC (fixed cron syntax)
+    - cron: "0 6 * * *" # every day at 6:00 UTC
 jobs:
   update-version:
     runs-on: ubuntu-latest
