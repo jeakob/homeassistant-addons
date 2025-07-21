@@ -1,4 +1,4 @@
-name: TrilliumNext Update Upstream Version
+name: Trillium Update Upstream Version
 
 on:
   workflow_dispatch:
@@ -45,10 +45,10 @@ jobs:
       
       - name: List trilliumnext folder content
         run: |
-          if [ -d "./trillium" ]; then
-            ls -la ./trillium
+          if [ -d "./trilliumnext" ]; then
+            ls -la ./trilliumnext
           else
-            echo "ERROR: trillium directory not found!"
+            echo "ERROR: trilliumnext directory not found!"
             ls -la .
             exit 1
           fi
@@ -59,15 +59,15 @@ jobs:
         run: |
           set -e
           
-          ADDON_DIR="./trillium"
+          ADDON_DIR="./trilliumnext"
           
           if [ ! -f "$ADDON_DIR/updater.json" ]; then
             echo "ERROR: $ADDON_DIR/updater.json not found!"
             exit 1
           fi
           
-          if [ ! -f "$ADDON_DIR/config.yaml" ]; then
-            echo "ERROR: $ADDON_DIR/config.yaml not found!"
+          if [ ! -f "$ADDON_DIR/config.json" ]; then
+            echo "ERROR: $ADDON_DIR/config.json not found!"
             exit 1
           fi
           
@@ -89,10 +89,26 @@ jobs:
               '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp.json && \
               mv tmp.json "$ADDON_DIR/updater.json"
             
-            echo "Updating config.yaml..."
+            echo "Updating config.json..."
             jq --arg v "$LATEST_VERSION" \
-              '.version = $v | .upstream = $v' "$ADDON_DIR/config.yaml" > tmp.json && \
-              mv tmp.json "$ADDON_DIR/config.yaml"
+              '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp.json && \
+              mv tmp.json "$ADDON_DIR/config.json"
+            
+            echo "Updating root config.yaml..."
+            if [ -f "config.yaml" ]; then
+              sed -i "s/version: \".*\"/version: \"$LATEST_VERSION\"/" config.yaml
+              echo "Root config.yaml updated"
+            else
+              echo "Warning: Root config.yaml not found"
+            fi
+            
+            echo "Updating README.md..."
+            if [ -f "README.md" ]; then
+              sed -i "s/Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Version: $LATEST_VERSION/" README.md
+              echo "README.md updated"
+            else
+              echo "Warning: README.md not found"
+            fi
             
             echo "Updating changelog..."
             if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
@@ -113,7 +129,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
-            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.yaml" "$ADDON_DIR/CHANGELOG.md"
+            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json" "$ADDON_DIR/CHANGELOG.md" "config.yaml" "README.md"
             
             if git diff --staged --quiet; then
               echo "No changes detected after update"
@@ -122,7 +138,9 @@ jobs:
               git commit -m "Update to upstream version $LATEST_VERSION" \
                          -m "Updated files:" \
                          -m "- updater.json: upstream_version -> $LATEST_VERSION" \
+                         -m "- config.json: version -> $LATEST_VERSION" \
                          -m "- config.yaml: version -> $LATEST_VERSION" \
+                         -m "- README.md: version -> $LATEST_VERSION" \
                          -m "- CHANGELOG.md: Updated with latest release notes" \
                          -m "[skip ci]"
               
