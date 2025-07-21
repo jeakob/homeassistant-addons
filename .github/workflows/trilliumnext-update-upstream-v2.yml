@@ -1,4 +1,8 @@
-name: TrilliumNext Update Upstream Version
+- name: Cleanup
+        if: always()
+        run: |
+          rm -f changelog.txt tmp.json
+          echo "Cleanup completed"name: TrilliumNext Update Upstream Version
 on:
   workflow_dispatch:
   schedule:
@@ -34,8 +38,11 @@ jobs:
       
       - name: Save changelog to file
         run: |
-          echo "${{ steps.get_release.outputs.body }}" > changelog.txt
+          # Use printf to handle special characters and newlines properly
+          printf '%s\n' "${{ steps.get_release.outputs.body }}" > changelog.txt
           echo "Changelog saved with $(wc -l < changelog.txt) lines"
+          echo "First few lines of changelog:"
+          head -3 changelog.txt || echo "Changelog is empty or unreadable"
       
       - name: List trilliumnext folder content (debug)
         run: |
@@ -94,10 +101,13 @@ jobs:
             
             # Copy changelog
             echo "Updating changelog..."
-            if [ -f "changelog.txt" ]; then
+            if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
               cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
+              echo "Changelog updated successfully"
             else
-              echo "Warning: changelog.txt not found, skipping changelog update"
+              echo "Warning: changelog.txt not found or empty, creating placeholder"
+              echo "# Changelog for version $LATEST_VERSION" > "$ADDON_DIR/CHANGELOG.md"
+              echo "No release notes available for this version." >> "$ADDON_DIR/CHANGELOG.md"
             fi
             
             # Verify updates were successful
@@ -135,8 +145,15 @@ jobs:
             echo "✅ No update needed - already at latest version $CURRENT_VERSION"
           fi
       
-      - name: Cleanup
-        if: always()
+      - name: Debug information
+        if: failure()
         run: |
-          rm -f changelog.txt tmp.json
-          echo "Cleanup completed"
+          echo "=== DEBUG INFO ==="
+          echo "Current directory: $(pwd)"
+          echo "Files in current directory:"
+          ls -la
+          echo "=== Environment variables ==="
+          echo "LATEST_VERSION: ${{ steps.get_release.outputs.tag }}"
+          echo "=== Git status ==="
+          git status || echo "Git status failed"
+          echo "=== End debug info ==="
