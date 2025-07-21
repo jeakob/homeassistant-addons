@@ -1,9 +1,4 @@
-# Update root config.yaml if it exists
-            if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
-              echo "Updating root config.yaml..."
-              sed -i "s/version: \".*\"/version: \"$LATEST_VERSION\"/" config.yaml
-              echo "Root config.yaml updated"
-            finame: Trillium Update Upstream Version
+name: Trillium Update Upstream Version
 
 on:
   workflow_dispatch:
@@ -137,6 +132,21 @@ jobs:
               sed -i "s/upstream: *\"*[^\"]*\"*/upstream: \"$LATEST_VERSION\"/" "$ADDON_DIR/config.yaml"
             fi
             
+            # Update root config.yaml if it exists
+            if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
+              echo "Updating root config.yaml..."
+              sed -i "s/version: \".*\"/version: \"$LATEST_VERSION\"/" config.yaml
+              echo "Root config.yaml updated"
+            fi
+            
+            echo "Updating README.md..."
+            if [ -f "README.md" ]; then
+              sed -i "s/Version: v[0-9]\+\.[0-9]\+\.[0-9]\+/Version: $LATEST_VERSION/" README.md
+              echo "README.md updated"
+            else
+              echo "Warning: README.md not found"
+            fi
+            
             echo "Updating changelog..."
             if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
               cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
@@ -161,6 +171,10 @@ jobs:
             
             if [ -f "config.yaml" ]; then
               git add "config.yaml"
+            fi
+            
+            if [ -f "README.md" ]; then
+              git add "README.md"
             fi
             
             if git diff --staged --quiet; then
