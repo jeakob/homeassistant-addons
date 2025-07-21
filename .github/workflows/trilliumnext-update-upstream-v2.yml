@@ -119,14 +119,12 @@ jobs:
               echo "No changes detected after update"
             else
               echo "Committing changes..."
-              git commit -m "Update to upstream version $LATEST_VERSION
-
-Updated files:
-- updater.json: upstream_version -> $LATEST_VERSION
-- config.json: version -> $LATEST_VERSION  
-- CHANGELOG.md: Updated with latest release notes
-
-[skip ci]"
+              git commit -m "Update to upstream version $LATEST_VERSION" \
+                         -m "Updated files:" \
+                         -m "- updater.json: upstream_version -> $LATEST_VERSION" \
+                         -m "- config.json: version -> $LATEST_VERSION" \
+                         -m "- CHANGELOG.md: Updated with latest release notes" \
+                         -m "[skip ci]"
               
               echo "Pushing changes..."
               git push
