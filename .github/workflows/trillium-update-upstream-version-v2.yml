@@ -1,0 +1,155 @@
+name: TrilliumNext Update Upstream Version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: Get latest release metadata from triliumnext/trilium
+        id: get_release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const res = await github.rest.repos.getLatestRelease({
+                owner: 'triliumnext',
+                repo: 'trilium'
+              });
+              core.setOutput("tag", res.data.tag_name);
+              core.setOutput("body", res.data.body || "No changelog available");
+              console.log(`Found release: ${res.data.tag_name}`);
+              return res.data.tag_name;
+            } catch (error) {
+              core.setFailed(`Failed to get latest release: ${error.message}`);
+              throw error;
+            }
+      
+      - name: Save changelog to file
+        run: |
+          cat << 'EOF' > changelog.txt
+          ${{ steps.get_release.outputs.body }}
+          EOF
+          echo "Changelog saved with $(wc -l < changelog.txt) lines"
+          echo "First few lines of changelog:"
+          head -3 changelog.txt || echo "Changelog is empty or unreadable"
+      
+      - name: List trilliumnext folder content
+        run: |
+          if [ -d "./trillium" ]; then
+            ls -la ./trillium
+          else
+            echo "ERROR: trillium directory not found!"
+            ls -la .
+            exit 1
+          fi
+      
+      - name: Check and update version files
+        env:
+          LATEST_VERSION: ${{ steps.get_release.outputs.tag }}
+        run: |
+          set -e
+          
+          ADDON_DIR="./trillium"
+          
+          if [ ! -f "$ADDON_DIR/updater.json" ]; then
+            echo "ERROR: $ADDON_DIR/updater.json not found!"
+            exit 1
+          fi
+          
+          if [ ! -f "$ADDON_DIR/config.json" ]; then
+            echo "ERROR: $ADDON_DIR/config.json not found!"
+            exit 1
+          fi
+          
+          CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
+          
+          if [ "$CURRENT_VERSION" = "null" ] || [ -z "$CURRENT_VERSION" ]; then
+            echo "ERROR: Could not read current version from updater.json"
+            exit 1
+          fi
+          
+          echo "Current: $CURRENT_VERSION | Latest: $LATEST_VERSION"
+          
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "Updating files to version $LATEST_VERSION"
+            TODAY=$(date +'%d-%m-%Y')
+            
+            echo "Updating updater.json..."
+            jq --arg v "$LATEST_VERSION" --arg d "$TODAY" \
+              '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp.json && \
+              mv tmp.json "$ADDON_DIR/updater.json"
+            
+            echo "Updating config.json..."
+            jq --arg v "$LATEST_VERSION" \
+              '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp.json && \
+              mv tmp.json "$ADDON_DIR/config.json"
+            
+            echo "Updating changelog..."
+            if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
+              cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
+              echo "Changelog updated successfully"
+            else
+              echo "Warning: changelog.txt not found or empty, creating placeholder"
+              echo "# Changelog for version $LATEST_VERSION" > "$ADDON_DIR/CHANGELOG.md"
+              echo "No release notes available for this version." >> "$ADDON_DIR/CHANGELOG.md"
+            fi
+            
+            NEW_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
+            if [ "$NEW_VERSION" != "$LATEST_VERSION" ]; then
+              echo "ERROR: Failed to update version in updater.json"
+              exit 1
+            fi
+            
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json" "$ADDON_DIR/CHANGELOG.md"
+            
+            if git diff --staged --quiet; then
+              echo "No changes detected after update"
+            else
+              echo "Committing changes..."
+              git commit -m "Update to upstream version $LATEST_VERSION" \
+                         -m "Updated files:" \
+                         -m "- updater.json: upstream_version -> $LATEST_VERSION" \
+                         -m "- config.json: version -> $LATEST_VERSION" \
+                         -m "- CHANGELOG.md: Updated with latest release notes" \
+                         -m "[skip ci]"
+              
+              echo "Pushing changes..."
+              git push
+              
+              echo "Successfully updated to version $LATEST_VERSION"
+            fi
+          else
+            echo "No update needed - already at latest version $CURRENT_VERSION"
+          fi
+      
+      - name: Debug information
+        if: failure()
+        run: |
+          echo "=== DEBUG INFO ==="
+          echo "Current directory: $(pwd)"
+          echo "Files in current directory:"
+          ls -la
+          echo "=== Environment variables ==="
+          echo "LATEST_VERSION: ${{ steps.get_release.outputs.tag }}"
+          echo "=== Git status ==="
+          git status || echo "Git status failed"
+          echo "=== End debug info ==="
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f changelog.txt tmp.json
+          echo "Cleanup completed"
