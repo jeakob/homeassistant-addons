@@ -80,7 +80,11 @@ jobs:
           
           # Check the trillium config.yaml version
           if [ -f "$ADDON_DIR/config.yaml" ]; then
-            CONFIG_VERSION=$(jq -r '.version' "$ADDON_DIR/config.yaml")
+            CONFIG_VERSION=$(grep "version:" "$ADDON_DIR/config.yaml" | sed 's/.*version: *"\([^"]*\)".*/\1/' | head -1)
+            if [ -z "$CONFIG_VERSION" ]; then
+              # Try without quotes in case the YAML doesn't use them
+              CONFIG_VERSION=$(grep "version:" "$ADDON_DIR/config.yaml" | sed 's/.*version: *\([^ ]*\).*/\1/' | head -1)
+            fi
             echo "Versions found:"
             echo "  updater.json: $CURRENT_VERSION"
             echo "  config.yaml: $CONFIG_VERSION"
@@ -123,9 +127,10 @@ jobs:
               mv tmp.json "$ADDON_DIR/updater.json"
             
             echo "Updating trillium/config.yaml..."
-            jq --arg v "$LATEST_VERSION" \
-              '.version = $v | .upstream = $v' "$ADDON_DIR/config.yaml" > tmp.json && \
-              mv tmp.json "$ADDON_DIR/config.yaml"
+            sed -i "s/version: *\"*[^\"]*\"*/version: \"$LATEST_VERSION\"/" "$ADDON_DIR/config.yaml"
+            if grep -q "upstream:" "$ADDON_DIR/config.yaml"; then
+              sed -i "s/upstream: *\"*[^\"]*\"*/upstream: \"$LATEST_VERSION\"/" "$ADDON_DIR/config.yaml"
+            fi
             
             # Update root config.yaml if it exists
             if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
