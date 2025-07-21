@@ -1,4 +1,9 @@
-name: Trillium Update Upstream Version
+# Update root config.yaml if it exists
+            if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
+              echo "Updating root config.yaml..."
+              sed -i "s/version: \".*\"/version: \"$LATEST_VERSION\"/" config.yaml
+              echo "Root config.yaml updated"
+            finame: Trillium Update Upstream Version
 
 on:
   workflow_dispatch:
@@ -132,41 +137,6 @@ jobs:
               sed -i "s/upstream: *\"*[^\"]*\"*/upstream: \"$LATEST_VERSION\"/" "$ADDON_DIR/config.yaml"
             fi
             
-            # Update root config.yaml if it exists
-            if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
-              echo "Updating root config.yaml..."
-              sed -i "s/version: \".*\"/version: \"$LATEST_VERSION\"/" config.yaml
-              echo "Root config.yaml updated"
-            fi
-            
-            echo "Updating README.md..."
-            if [ -f "README.md" ]; then
-              echo "Before update - Current README version line:"
-              grep -n "Version:" README.md || echo "No 'Version:' line found"
-              
-              # Update the version in the title line - handles your specific format:
-              # "# TriliumNext Notes Version: v0.96.0 for Home Assistant"
-              sed -i 's/\(TriliumNext Notes Version: \)v[0-9]\+\.[0-9]\+\.[0-9]\+/\1'"$LATEST_VERSION"'/g' README.md
-              
-              # Also try a more general pattern in case the format changes
-              sed -i 's/\(Version: \)v[0-9]\+\.[0-9]\+\.[0-9]\+/\1'"$LATEST_VERSION"'/g' README.md
-              
-              echo "After update - Updated README version line:"
-              grep -n "Version:" README.md || echo "No version line found"
-              
-              # Verify the update worked
-              if grep -q "$LATEST_VERSION" README.md; then
-                echo "✅ README.md version successfully updated to $LATEST_VERSION"
-              else
-                echo "⚠️  WARNING: README.md may not have been updated correctly"
-                echo "Expected version: $LATEST_VERSION"
-                echo "Full title line:"
-                grep "TriliumNext Notes" README.md || grep -i "version" README.md
-              fi
-            else
-              echo "Warning: README.md not found"
-            fi
-            
             echo "Updating changelog..."
             if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
               cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
@@ -191,10 +161,6 @@ jobs:
             
             if [ -f "config.yaml" ]; then
               git add "config.yaml"
-            fi
-            
-            if [ -f "README.md" ]; then
-              git add "README.md"
             fi
             
             if git diff --staged --quiet; then
