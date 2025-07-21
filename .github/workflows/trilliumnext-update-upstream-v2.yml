@@ -1,12 +1,10 @@
-- name: Cleanup
-        if: always()
-        run: |
-          rm -f changelog.txt tmp.json
-          echo "Cleanup completed"name: TrilliumNext Update Upstream Version
+name: TrilliumNext Update Upstream Version
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *" # every day at 6:00 UTC
+    - cron: "0 6 * * *"
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
@@ -38,13 +36,14 @@ jobs:
       
       - name: Save changelog to file
         run: |
-          # Use printf to handle special characters and newlines properly
-          printf '%s\n' "${{ steps.get_release.outputs.body }}" > changelog.txt
+          cat << 'EOF' > changelog.txt
+          ${{ steps.get_release.outputs.body }}
+          EOF
           echo "Changelog saved with $(wc -l < changelog.txt) lines"
           echo "First few lines of changelog:"
           head -3 changelog.txt || echo "Changelog is empty or unreadable"
       
-      - name: List trilliumnext folder content (debug)
+      - name: List trilliumnext folder content
         run: |
           if [ -d "./trilliumnext" ]; then
             ls -la ./trilliumnext
@@ -54,15 +53,14 @@ jobs:
             exit 1
           fi
       
-      - name: Check & update version files
+      - name: Check and update version files
         env:
           LATEST_VERSION: ${{ steps.get_release.outputs.tag }}
         run: |
-          set -e  # Exit on any error
+          set -e
           
           ADDON_DIR="./trilliumnext"
           
-          # Verify required files exist
           if [ ! -f "$ADDON_DIR/updater.json" ]; then
             echo "ERROR: $ADDON_DIR/updater.json not found!"
             exit 1
@@ -73,7 +71,6 @@ jobs:
             exit 1
           fi
           
-          # Get current version
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
           
           if [ "$CURRENT_VERSION" = "null" ] || [ -z "$CURRENT_VERSION" ]; then
@@ -87,19 +84,16 @@ jobs:
             echo "Updating files to version $LATEST_VERSION"
             TODAY=$(date +'%d-%m-%Y')
             
-            # Update updater.json
             echo "Updating updater.json..."
             jq --arg v "$LATEST_VERSION" --arg d "$TODAY" \
               '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp.json && \
               mv tmp.json "$ADDON_DIR/updater.json"
             
-            # Update config.json
             echo "Updating config.json..."
             jq --arg v "$LATEST_VERSION" \
               '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp.json && \
               mv tmp.json "$ADDON_DIR/config.json"
             
-            # Copy changelog
             echo "Updating changelog..."
             if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
               cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
@@ -110,21 +104,17 @@ jobs:
               echo "No release notes available for this version." >> "$ADDON_DIR/CHANGELOG.md"
             fi
             
-            # Verify updates were successful
             NEW_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
             if [ "$NEW_VERSION" != "$LATEST_VERSION" ]; then
               echo "ERROR: Failed to update version in updater.json"
               exit 1
             fi
             
-            # Configure git
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
-            # Add files to git
             git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json" "$ADDON_DIR/CHANGELOG.md"
             
-            # Check if there are changes to commit
             if git diff --staged --quiet; then
               echo "No changes detected after update"
             else
@@ -139,10 +129,10 @@ jobs:
               echo "Pushing changes..."
               git push
               
-              echo "✅ Successfully updated to version $LATEST_VERSION"
+              echo "Successfully updated to version $LATEST_VERSION"
             fi
           else
-            echo "✅ No update needed - already at latest version $CURRENT_VERSION"
+            echo "No update needed - already at latest version $CURRENT_VERSION"
           fi
       
       - name: Debug information
@@ -157,3 +147,9 @@ jobs:
           echo "=== Git status ==="
           git status || echo "Git status failed"
           echo "=== End debug info ==="
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f changelog.txt tmp.json
+          echo "Cleanup completed"
