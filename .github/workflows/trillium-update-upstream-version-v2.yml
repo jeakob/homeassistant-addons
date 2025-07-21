@@ -40,7 +40,6 @@ jobs:
           ${{ steps.get_release.outputs.body }}
           EOF
           echo "Changelog saved with $(wc -l < changelog.txt) lines"
-          echo "First few lines of changelog:"
           head -3 changelog.txt || echo "Changelog is empty or unreadable"
 
       - name: List trilliumnext folder content
@@ -70,7 +69,6 @@ jobs:
           fi
 
           CURRENT_VERSION=$(jq -r '.upstream_version' "$ADDON_DIR/updater.json")
-
           if [ "$CURRENT_VERSION" = "null" ] || [ -z "$CURRENT_VERSION" ]; then
             echo "ERROR: Could not read current version from updater.json"
             exit 1
@@ -83,10 +81,22 @@ jobs:
           echo "  Latest available: $LATEST_VERSION"
 
           NEEDS_UPDATE=false
+
           if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ] || [ "$LATEST_VERSION" != "$CONFIG_VERSION" ]; then
             NEEDS_UPDATE=true
           fi
 
+          # Check build.yaml version
+          BUILD_YAML_IMAGE_VERSION=""
+          if [ -f "$ADDON_DIR/build.yaml" ]; then
+            BUILD_YAML_IMAGE_VERSION=$(grep 'docker.io/triliumnext/trilium:' "$ADDON_DIR/build.yaml" | head -n1 | sed 's/.*trilium:\(v[0-9.]*\).*/\1/')
+            echo "  build.yaml image version: $BUILD_YAML_IMAGE_VERSION"
+            if [ "$BUILD_YAML_IMAGE_VERSION" != "$LATEST_VERSION" ]; then
+              NEEDS_UPDATE=true
+            fi
+          fi
+
+          # Check root config.yaml
           ROOT_CONFIG_NEEDS_UPDATE=false
           if [ -f "config.yaml" ]; then
             ROOT_CONFIG_VERSION=$(grep "version:" config.yaml | sed 's/.*version: *"\{0,1\}\([^"]*\)".*/\1/')
@@ -114,7 +124,7 @@ jobs:
 
             echo "Updating build.yaml..."
             if [ -f "$ADDON_DIR/build.yaml" ]; then
-              sed -i "s|docker.io/triliumnext/trilium:v[0-9]\+\.[0-9]\+\.[0-9]\+|docker.io/triliumnext/trilium:$LATEST_VERSION|g" "$ADDON_DIR/build.yaml"
+              sed -i "s|docker.io/triliumnext/trilium:v[0-9.]\+|docker.io/triliumnext/trilium:$LATEST_VERSION|g" "$ADDON_DIR/build.yaml"
               echo "build.yaml updated to $LATEST_VERSION"
             else
               echo "Warning: build.yaml not found"
@@ -123,7 +133,6 @@ jobs:
             if [ "$ROOT_CONFIG_NEEDS_UPDATE" = "true" ]; then
               echo "Updating root config.yaml..."
               sed -i "s/version: *\"*[^\"]*\"*/version: \"$LATEST_VERSION\"/" config.yaml
-              echo "Root config.yaml updated"
             fi
 
             echo "Updating README.md..."
@@ -137,9 +146,7 @@ jobs:
             echo "Updating changelog..."
             if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
               cp changelog.txt "$ADDON_DIR/CHANGELOG.md"
-              echo "Changelog updated successfully"
             else
-              echo "Warning: changelog.txt not found or empty, creating placeholder"
               echo "# Changelog for version $LATEST_VERSION" > "$ADDON_DIR/CHANGELOG.md"
               echo "No release notes available for this version." >> "$ADDON_DIR/CHANGELOG.md"
             fi
@@ -161,17 +168,15 @@ jobs:
             if git diff --staged --quiet; then
               echo "No changes detected after update"
             else
-              echo "Committing changes..."
               git commit -m "Update to upstream version $LATEST_VERSION" \
-                          -m "Updated files:" \
-                          -m "- updater.json: upstream_version -> $LATEST_VERSION" \
-                          -m "- trillium/config.yaml: version -> $LATEST_VERSION" \
-                          -m "- build.yaml: image tags -> $LATEST_VERSION" \
-                          -m "- CHANGELOG.md: Updated with latest release notes" \
-                          -m "[skip ci]"
-              echo "Pushing changes..."
+                           -m "Updated files:" \
+                           -m "- updater.json: upstream_version -> $LATEST_VERSION" \
+                           -m "- config.yaml: version -> $LATEST_VERSION" \
+                           -m "- build.yaml: image tags -> $LATEST_VERSION" \
+                           -m "- CHANGELOG.md: latest release notes" \
+                           -m "[skip ci]"
               git push
-              echo "Successfully updated to version $LATEST_VERSION"
+              echo "✅ Successfully updated to version $LATEST_VERSION"
             fi
           else
             echo "✅ All files are up to date with version $CURRENT_VERSION"
@@ -184,9 +189,7 @@ jobs:
           echo "Current directory: $(pwd)"
           echo "Files in current directory:"
           ls -la
-          echo "=== Environment variables ==="
           echo "LATEST_VERSION: ${{ steps.get_release.outputs.tag }}"
-          echo "=== Git status ==="
           git status || echo "Git status failed"
           echo "=== End debug info ==="
 
