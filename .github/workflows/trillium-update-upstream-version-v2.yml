@@ -66,8 +66,8 @@ jobs:
             exit 1
           fi
           
-          if [ ! -f "$ADDON_DIR/config.json" ]; then
-            echo "ERROR: $ADDON_DIR/config.json not found!"
+          if [ ! -f "$ADDON_DIR/config.yaml" ]; then
+            echo "ERROR: $ADDON_DIR/config.yaml not found!"
             exit 1
           fi
           
@@ -89,10 +89,10 @@ jobs:
               '.upstream_version = $v | .last_update = $d' "$ADDON_DIR/updater.json" > tmp.json && \
               mv tmp.json "$ADDON_DIR/updater.json"
             
-            echo "Updating config.json..."
+            echo "Updating config.yaml..."
             jq --arg v "$LATEST_VERSION" \
-              '.version = $v | .upstream = $v' "$ADDON_DIR/config.json" > tmp.json && \
-              mv tmp.json "$ADDON_DIR/config.json"
+              '.version = $v | .upstream = $v' "$ADDON_DIR/config.yaml" > tmp.json && \
+              mv tmp.json "$ADDON_DIR/config.yaml"
             
             echo "Updating changelog..."
             if [ -f "changelog.txt" ] && [ -s "changelog.txt" ]; then
@@ -113,7 +113,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
-            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.json" "$ADDON_DIR/CHANGELOG.md"
+            git add "$ADDON_DIR/updater.json" "$ADDON_DIR/config.yaml" "$ADDON_DIR/CHANGELOG.md"
             
             if git diff --staged --quiet; then
               echo "No changes detected after update"
@@ -122,7 +122,7 @@ jobs:
               git commit -m "Update to upstream version $LATEST_VERSION" \
                          -m "Updated files:" \
                          -m "- updater.json: upstream_version -> $LATEST_VERSION" \
-                         -m "- config.json: version -> $LATEST_VERSION" \
+                         -m "- config.yaml: version -> $LATEST_VERSION" \
                          -m "- CHANGELOG.md: Updated with latest release notes" \
                          -m "[skip ci]"
               
