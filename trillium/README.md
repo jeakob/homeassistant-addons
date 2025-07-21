@@ -1,4 +1,4 @@
-<img src="icon.png" width="100" height="100">
+<img src="https://github.com/jeakob/homeassistant-addons/raw/main/trillium/icon.png" width="100" height="100">
 
 # TriliumNext Notes Version: v0.96.0 for Home Assistant
 
