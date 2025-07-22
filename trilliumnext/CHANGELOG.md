@@ -1,3 +1,6 @@
+> [!TIP]
+> This release is functionally identical to v0.97.0, but it fixes the version number not being correctly set in the release, causing some issues with the cache.
+
 > [!CAUTION]
 > **Important Security Update**
 > 
@@ -11,7 +14,9 @@
 > *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Notes) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
-## 💡 Key highlights
+## Changes from v0.97.0
+
+### 💡 Key highlights
 
 *   “Books” have been renamed to Collections to better match their intentions.
     *   **A new collection was introduced,** _**table.**_
@@ -21,7 +26,7 @@
     *   The collections are not displayed directly in “Insert child” in the note tree with predefined configuration such as promoted attributes to make them easier to use (e.g. for calendar, geomap).
 *   A new editing mechanism was introduced: quick edit. This opens notes for editing in a popup instead of a tab, allowing easy access. This is especially useful for collections, to edit notes without switching context.
 
-## 🐞 Bugfixes
+### 🐞 Bugfixes
 
 *   [Missing note meta. Can't export empty note and involved note tree](https://github.com/TriliumNext/Trilium/issues/6146)
 *   [Mermaid notes sluggish](https://github.com/TriliumNext/Trilium/issues/5805)
@@ -39,7 +44,7 @@
 *   [Issues on Prometeus dashboard due to timestamps](https://github.com/TriliumNext/Trilium/issues/6354)
 *   [Ckeditor (re)-creation likely causes important lagging when coming from code note](https://github.com/TriliumNext/Trilium/issues/6367)
 
-## ✨ Improvements
+### ✨ Improvements
 
 *   Export to ZIP:
     *   Improve error handling
@@ -57,13 +62,13 @@
     *   Calendar View: Added options to hide weekends & display week numbers directly from the “Collection Properties” in the ribbon.
 *   [Tree Context Menu: relocate the "Duplicate subtree" menu item](https://github.com/TriliumNext/Trilium/pull/6299) by @adoriandoran
 
-## 📖 Documentation
+### 📖 Documentation
 
 *   New features, table.
 *   Updated collections.
 *   Keyboard shortcuts for the note tree.
 
-## 🛠️ Technical updates
+### 🛠️ Technical updates
 
 *   Updated to Electron 37.2.2.
 *   Mindmap dependency (MindElixir) was updated to the latest major version.
