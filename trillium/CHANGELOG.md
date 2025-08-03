@@ -1,12 +1,6 @@
-> [!TIP]
-> This release is functionally identical to v0.97.0, but it fixes the version number not being correctly set in the release, causing some issues with the cache.
-
-> [!CAUTION]
-> **Important Security Update**
-> 
-> This release addresses a security vulnerability that could make password-based attacks against your Trilium instance more feasible. We strongly recommend upgrading to this version as soon as possible, especially if your Trilium server is accessible over a network.
-> 
-> For more details about this security fix, please see our published security advisory which will be available 14 days after this release.
+# v0.97.2
+> [!NOTE]
+> Translations are now easily editable online via Weblate. If you wish to contribute to Trilium by translating to your native language, head on over to [our Weblate page](https://hosted.weblate.org/engage/trilium/).
 
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
@@ -14,63 +8,54 @@
 > *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Notes) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
-## Changes from v0.97.0
+## 💡 Key highlights
 
-### 💡 Key highlights
+*   A new collection type has been added: a board in which child notes are grouped in columns.
+*   Geo map now comes with a vector map by default.
+    *   The vector styles will provide for a smoother experience, consult the documentation for more information.
+    *   Apart from that, there are multiple styles to choose from in the _Collection properties_ section in the ribbon, including dark themes.
+    *   Apart from that, added an option to display a scale on the map.
+*   Jump to note was enhanced to allow triggering commands (such as the ones that can have a keyboard shortcut assigned to them) quickly.
+    *   Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to test it out.
+    *   The feature was renamed to simply “Jump to…” to better accommodate the new role.
+    *   For more information, check the user guide for “Jump to…”.
 
-*   “Books” have been renamed to Collections to better match their intentions.
-    *   **A new collection was introduced,** _**table.**_
-        *   See the in-app documentation for more information.
-        *   Custom table theme for Trilium by @adoriandoran
-    *   Geomap: The geomap was converted from a standalone note type to a collection.
-    *   The collections are not displayed directly in “Insert child” in the note tree with predefined configuration such as promoted attributes to make them easier to use (e.g. for calendar, geomap).
-*   A new editing mechanism was introduced: quick edit. This opens notes for editing in a popup instead of a tab, allowing easy access. This is especially useful for collections, to edit notes without switching context.
+## 🐞 Bugfixes
 
-### 🐞 Bugfixes
+*   [Shared note dark mode text doesn't change](https://github.com/TriliumNext/Trilium/issues/6427)
+*   [Markdown export of simple tables results in HTML, not Markdown](https://github.com/TriliumNext/Trilium/issues/6366)
+*   [Cannot edit ReadOnly note in quick edit](https://github.com/TriliumNext/Trilium/issues/6425)
+*   [Documentation for collections is empty](https://github.com/TriliumNext/Trilium/issues/6420)
+*   [Laggy "Mermaid Diagram" note type refresh during editing](https://github.com/TriliumNext/Trilium/issues/6443)
+*   Geomap not reacting to marker icon changes.
+*   [Checkbox Inputs (in Canvas Node > Export image...) have broken styling](https://github.com/TriliumNext/Trilium/issues/6463)
+*   [Rename Book note type to Collection](https://github.com/TriliumNext/Trilium/issues/6471)
+*   [Table view persistence not working in protected notes](https://github.com/TriliumNext/Trilium/issues/6473#issuecomment-3120029185)
+*   [Table caption print issue](https://github.com/TriliumNext/Trilium/issues/6483)
+*   [Commonmark import sub and sup tags not working](https://github.com/TriliumNext/Trilium/issues/4307)
+*   [Migration failing if there is a protected geomap](https://github.com/TriliumNext/Trilium/issues/6489)
+*   Window refreshing when sorting notes via the dialog.
+*   [Odd behavior in Safari on macOS (random refreshing+new note creation+user guide opens)](https://github.com/TriliumNext/Trilium/issues/6218)
+*   Note tooltip showing up in note list
+*   Copy to clipboard button also opening into note list
 
-*   [Missing note meta. Can't export empty note and involved note tree](https://github.com/TriliumNext/Trilium/issues/6146)
-*   [Mermaid notes sluggish](https://github.com/TriliumNext/Trilium/issues/5805)
-*   [In-app help confusing due to ligatures](https://github.com/TriliumNext/Trilium/issues/6224)
-*   Geo map: tooltip not showing.
-*   [Nix flake support broke with electron 37 upgrade](https://github.com/TriliumNext/Trilium/issues/6217)
-*   Signing on Windows did not work on the previous release.
-*   [When editing a note in Linux, middle-clicking a note title in tree pane triggers a paste action](https://github.com/TriliumNext/Trilium/issues/5812)
-*   Editor not focused after switching tabs.
-*   PDF file preview: inconvenient 10px scrollable margin at the bottom.
-*   Calendar view:
-    *   Subtree children not displayed when in calendar root.
-    *   Title changes to events not reflected.
-*   [Attributes Dialogue Doesn't Display for existing attributes](https://github.com/TriliumNext/Trilium/issues/5718)
-*   [Issues on Prometeus dashboard due to timestamps](https://github.com/TriliumNext/Trilium/issues/6354)
-*   [Ckeditor (re)-creation likely causes important lagging when coming from code note](https://github.com/TriliumNext/Trilium/issues/6367)
+## ✨ Improvements
 
-### ✨ Improvements
+*   [Show inline mermaid diagram in share view instead of mermaid diagram code](https://github.com/TriliumNext/Trilium/issues/5438)
+*   Canvas improvements:
+    *   Add grid to canvas by @Papierkorb2292
+    *   Improve style of toolbars and dropdowns on the Next theme.
+*   New type for promoted attributes: color.
+*   Web view note preview (in note list):
+    *   The `#webViewSrc` is now hidden
+    *   Dedicated button to open the link externally.
+*   [User Guide pages should be searchable](https://github.com/TriliumNext/Trilium/issues/6515)
 
-*   Export to ZIP:
-    *   Improve error handling
-    *   Improve handling of notes with empty title.
-*   Tree context menu: reorder the note types of “Insert (child) note...” by @adoriandoran
-*   [Note map: add attributes to include or exclude relations](https://github.com/TriliumNext/Trilium/pull/6104) by @kieranknowles1
-*   [iframe sandbox allow popups](https://github.com/TriliumNext/Trilium/issues/5698)
-*   [Badges for the note type context menu](https://github.com/TriliumNext/Trilium/pull/6229) by @adoriandoran
-*   The “Book/Collection Properties" ribbon tab no longer focuses automatically.
-*   Geomap improvements:
-    *   Geolocation now displayed in the context menu.
-    *   Context menu for empty spaces on the map, for quickly viewing the location or adding a new marker.
-    *   Adding markers by drag & dropping from note tree.
-    *   Read-only mode to prevent modification such as dragging.
-    *   Calendar View: Added options to hide weekends & display week numbers directly from the “Collection Properties” in the ribbon.
-*   [Tree Context Menu: relocate the "Duplicate subtree" menu item](https://github.com/TriliumNext/Trilium/pull/6299) by @adoriandoran
+## 🌍 Internationalization
 
-### 📖 Documentation
+*   100% translation coverage for Romanian.
+*   Spanish language improvements by @Aitanuqui
 
-*   New features, table.
-*   Updated collections.
-*   Keyboard shortcuts for the note tree.
+## 🛠️ Technical updates
 
-### 🛠️ Technical updates
-
-*   Updated to Electron 37.2.2.
-*   Mindmap dependency (MindElixir) was updated to the latest major version.
-*   Mermaid diagrams updated to the latest version (new diagram type tree map supported).
-*   CKEditor updated to latest major version (46).
+*   The shortcut keys management was completely rewritten as it was based on an older library. **Please raise any issues you might have with your keyboard shortcuts.**
