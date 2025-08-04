@@ -1,11 +1,10 @@
-# v0.97.2
 > [!NOTE]
 > Translations are now easily editable online via Weblate. If you wish to contribute to Trilium by translating to your native language, head on over to [our Weblate page](https://hosted.weblate.org/engage/trilium/).
 
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
-> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Notes) (top-right).
+> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
 ## 💡 Key highlights
