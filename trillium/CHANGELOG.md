@@ -1,61 +1,63 @@
-# v0.97.2
-> [!NOTE]
-> Translations are now easily editable online via Weblate. If you wish to contribute to Trilium by translating to your native language, head on over to [our Weblate page](https://hosted.weblate.org/engage/trilium/).
-
+# v0.98.0
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
-> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Notes) (top-right).
+> *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
 ## 💡 Key highlights
 
-*   A new collection type has been added: a board in which child notes are grouped in columns.
-*   Geo map now comes with a vector map by default.
-    *   The vector styles will provide for a smoother experience, consult the documentation for more information.
-    *   Apart from that, there are multiple styles to choose from in the _Collection properties_ section in the ribbon, including dark themes.
-    *   Apart from that, added an option to display a scale on the map.
-*   Jump to note was enhanced to allow triggering commands (such as the ones that can have a keyboard shortcut assigned to them) quickly.
-    *   Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>J</kbd> to test it out.
-    *   The feature was renamed to simply “Jump to…” to better accommodate the new role.
-    *   For more information, check the user guide for “Jump to…”.
+*   [Enhanced Search with Fuzzy Matching and Better UX](https://github.com/TriliumNext/Trilium/pull/6536) by @perfectra1n
+*   For Linux users, RPM packages are now GPG-signed.
+    *   The keys must be imported once per device, before installation: `sudo rpm --import https://triliumnotes.org/RPM-GPG-KEY-trilium`
 
 ## 🐞 Bugfixes
 
-*   [Shared note dark mode text doesn't change](https://github.com/TriliumNext/Trilium/issues/6427)
-*   [Markdown export of simple tables results in HTML, not Markdown](https://github.com/TriliumNext/Trilium/issues/6366)
-*   [Cannot edit ReadOnly note in quick edit](https://github.com/TriliumNext/Trilium/issues/6425)
-*   [Documentation for collections is empty](https://github.com/TriliumNext/Trilium/issues/6420)
-*   [Laggy "Mermaid Diagram" note type refresh during editing](https://github.com/TriliumNext/Trilium/issues/6443)
-*   Geomap not reacting to marker icon changes.
-*   [Checkbox Inputs (in Canvas Node > Export image...) have broken styling](https://github.com/TriliumNext/Trilium/issues/6463)
-*   [Rename Book note type to Collection](https://github.com/TriliumNext/Trilium/issues/6471)
-*   [Table view persistence not working in protected notes](https://github.com/TriliumNext/Trilium/issues/6473#issuecomment-3120029185)
-*   [Table caption print issue](https://github.com/TriliumNext/Trilium/issues/6483)
-*   [Commonmark import sub and sup tags not working](https://github.com/TriliumNext/Trilium/issues/4307)
-*   [Migration failing if there is a protected geomap](https://github.com/TriliumNext/Trilium/issues/6489)
-*   Window refreshing when sorting notes via the dialog.
-*   [Odd behavior in Safari on macOS (random refreshing+new note creation+user guide opens)](https://github.com/TriliumNext/Trilium/issues/6218)
-*   Note tooltip showing up in note list
-*   Copy to clipboard button also opening into note list
+*   The "chat with notes" icon re-appears on 0.97.2's Launchbar after update, even though the LLM feature was disabled before
+*   Board view: sub-children (recursive) not displayed.
+*   [Canvas: unable to open internal note path links](https://github.com/TriliumNext/Trilium/issues/6606)
+*   Delay when opening a Text note for the first time
+*   Search term is not highlighted in preview search result
+*   ETAPI: Save note revision if needed by @perfectra1n
+*   [No update notification in the global menu](https://github.com/TriliumNext/Trilium/pull/6657) by @SiriusXT
 
 ## ✨ Improvements
 
-*   [Show inline mermaid diagram in share view instead of mermaid diagram code](https://github.com/TriliumNext/Trilium/issues/5438)
-*   Canvas improvements:
-    *   Add grid to canvas by @Papierkorb2292
-    *   Improve style of toolbars and dropdowns on the Next theme.
-*   New type for promoted attributes: color.
-*   Web view note preview (in note list):
-    *   The `#webViewSrc` is now hidden
-    *   Dedicated button to open the link externally.
-*   [User Guide pages should be searchable](https://github.com/TriliumNext/Trilium/issues/6515)
+*   Zen mode is now supported on mobile by @Papierkorb2292
+*   Code notes: new Cobalt2 theme by @hulmgulm
+*   Existing users will be prompted with a message at the start of the application (and an option to dismiss it permanently):
+    *   To enable background effects on Windows, since it has become stable.
+    *   To use the TriliumNext theme.
+*   The built-in themes were renamed:
+    *   TriliumNext themes become simply Trilium
+    *   The Light/Dark/Auto themes become Legacy
+*   [Clean up old backend logs](https://github.com/TriliumNext/Trilium/pull/6609) by @perfectra1n
+
+## 📖 Documentation
+
+*   update doc references from triliumnext/notes to triliumnext/trilium by @perfectra1n
+*   Simple Update/Autoupdate Script by @serossi
+*   Improve OIDC docs by @JYC333
+*   Traditional Chinese README by @francistw
+*   README improvements by @meichthys
 
 ## 🌍 Internationalization
 
-*   100% translation coverage for Romanian.
-*   Spanish language improvements by @Aitanuqui
+*   Improvements to multiple languages:
+    *   Chinese (Traditional)
+    *   Spanish
+*   Some work started on new languages:
+    
+    Portuguese (Brazil), Japanese, Russian, Serbian, Italian, Greek, Catalan
+*   Added new languages:
+    *   Russian (translations by @questamor)
+    *   Japanese language (translations by [acwr47](https://hosted.weblate.org/user/acwr47/))\[…\]
 
 ## 🛠️ Technical updates
 
-*   The shortcut keys management was completely rewritten as it was based on an older library. **Please raise any issues you might have with your keyboard shortcuts.**
+*   Add duplicateSubtree to backend API by @Geekswordsman
+*   Fixed CVE-2025-54798 in `tmp` dependency
+*   Remove unnecessary idea directory by @GrantZhu1001
+*   Support getting an attribute value by ID in BNote by @Geekswordsman
+*   only run nightly.yml on TriliumNext/Trilium by @maphew
+*   All the dialogs have been converted to React/Preact for better maintainability. **If you notice any regressions, please report them.**
