@@ -1,63 +1,40 @@
-# v0.98.0
+# v0.98.1
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
 > *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
-## 💡 Key highlights
-
-*   [Enhanced Search with Fuzzy Matching and Better UX](https://github.com/TriliumNext/Trilium/pull/6536) by @perfectra1n
-*   For Linux users, RPM packages are now GPG-signed.
-    *   The keys must be imported once per device, before installation: `sudo rpm --import https://triliumnotes.org/RPM-GPG-KEY-trilium`
-
 ## 🐞 Bugfixes
 
-*   The "chat with notes" icon re-appears on 0.97.2's Launchbar after update, even though the LLM feature was disabled before
-*   Board view: sub-children (recursive) not displayed.
-*   [Canvas: unable to open internal note path links](https://github.com/TriliumNext/Trilium/issues/6606)
-*   Delay when opening a Text note for the first time
-*   Search term is not highlighted in preview search result
-*   ETAPI: Save note revision if needed by @perfectra1n
-*   [No update notification in the global menu](https://github.com/TriliumNext/Trilium/pull/6657) by @SiriusXT
+*   [Keyboard shortcut catches QWERTY keys instead of owner's](https://github.com/TriliumNext/Trilium/issues/6547)
+*   [\`-character doesn't work in shortcuts](https://github.com/TriliumNext/Trilium/issues/6784)
+*   Quick search: attribute search no longer working
+*   Settings not fitting well on mobile.
+*   [Attributes/tags not showing up in search results](https://github.com/TriliumNext/Trilium/pull/6752)
+*   [Note links always follow note title](https://github.com/TriliumNext/Trilium/issues/6776)
 
 ## ✨ Improvements
 
-*   Zen mode is now supported on mobile by @Papierkorb2292
-*   Code notes: new Cobalt2 theme by @hulmgulm
-*   Existing users will be prompted with a message at the start of the application (and an option to dismiss it permanently):
-    *   To enable background effects on Windows, since it has become stable.
-    *   To use the TriliumNext theme.
-*   The built-in themes were renamed:
-    *   TriliumNext themes become simply Trilium
-    *   The Light/Dark/Auto themes become Legacy
-*   [Clean up old backend logs](https://github.com/TriliumNext/Trilium/pull/6609) by @perfectra1n
+*   Quick search: format multi-line results better
+*   [Add UI performance-related settings](https://github.com/TriliumNext/Trilium/pull/6747) by @adoriandoran
+*   [Reduce or disable search animation](https://github.com/TriliumNext/Trilium/issues/6698) by @adoriandoran
+*   Fuzzy search should have a "non fuzzy" option by @perfectra1n
 
 ## 📖 Documentation
 
-*   update doc references from triliumnext/notes to triliumnext/trilium by @perfectra1n
-*   Simple Update/Autoupdate Script by @serossi
-*   Improve OIDC docs by @JYC333
-*   Traditional Chinese README by @francistw
-*   README improvements by @meichthys
+*   [Swagger UI for the internal API](https://github.com/TriliumNext/Trilium/pull/6719) by @perfectra1n
+*   [Improve documentation on environment variables](https://github.com/TriliumNext/Trilium/pull/6727) by @perfectra1n
 
 ## 🌍 Internationalization
 
-*   Improvements to multiple languages:
-    *   Chinese (Traditional)
-    *   Spanish
-*   Some work started on new languages:
-    
-    Portuguese (Brazil), Japanese, Russian, Serbian, Italian, Greek, Catalan
-*   Added new languages:
-    *   Russian (translations by @questamor)
-    *   Japanese language (translations by [acwr47](https://hosted.weblate.org/user/acwr47/))\[…\]
+*   Thanks to our contributors on Weblate:
+*   Added support for the Ukrainian language.
+*   Increased coverage for most of the languages.
 
 ## 🛠️ Technical updates
 
-*   Add duplicateSubtree to backend API by @Geekswordsman
-*   Fixed CVE-2025-54798 in `tmp` dependency
-*   Remove unnecessary idea directory by @GrantZhu1001
-*   Support getting an attribute value by ID in BNote by @Geekswordsman
-*   only run nightly.yml on TriliumNext/Trilium by @maphew
-*   All the dialogs have been converted to React/Preact for better maintainability. **If you notice any regressions, please report them.**
+*   Mermaid diagrams: patch for CVE-2025-54880
+*   The settings were ported to React. **If you notice any issues with the settings, let us know and we'll promptly fix them.**
+*   [Improve management for settings INI](https://github.com/TriliumNext/Trilium/pull/6726) by @perfectra1n
+*   Log same error message on API 401 as on login error to allow fail2ban blocking by @hulmgulm
