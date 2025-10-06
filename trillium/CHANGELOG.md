@@ -1,4 +1,4 @@
-# v0.99.0
+# v0.99.1
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
@@ -7,81 +7,31 @@
 
 ## 💡 Key highlights
 
-*   The documentation is now available at [docs.triliumnotes.org](https://docs.triliumnotes.org/). (by @perfectra1n).
+*   Trilium now has an official homepage: [https://triliumnotes.org/](https://triliumnotes.org/). Suggestions and bug reports are welcome.
 
 ## 🐞 Bugfixes
 
-*   Revisions show the wrong note.
-*   Revision list exiting out of bounds.
-*   Various minor fixes to settings & modals following the porting to React.
-*   [Newly created child note may not show-up when the tree has sorting overrides](https://github.com/TriliumNext/Trilium/issues/6820) by @rom1dep
-*   The context menu of history navigation buttons (back/next) for the desktop application didn't work.
-*   Background effects causing black background on Windows 10.
-*   [#cssClass isn't applied to note content in mobile layout](https://github.com/TriliumNext/Trilium/issues/6798) by @Papierkorb2292
-*   [Hotkeys interfering with IME composition](https://github.com/TriliumNext/Trilium/issues/6846) by @perfectra1n
-*   [Right-clicking the note tree buttons triggered their action instead of context menu](https://github.com/TriliumNext/Trilium/pull/6903) by @SiriusXT
-*   [Include note size not taken into account](https://github.com/TriliumNext/Trilium/issues/6947)
-*   [Shrink images is always displayed when importing notes](https://github.com/TriliumNext/Trilium/issues/6930)
-*   [Redirect bare domain not working properly when two-factor authentication is on](https://github.com/TriliumNext/Trilium/pull/6961) by @EnBandit
-*   Importing files doesn't update collections
-*   Background effects breaking if native title bar is enabled.
-*   Promoting the note source tab to a new window, brings the note editor instead.
-*   PDF preview card: “Download” and “Open” buttons would also open the note instead of just doing their action.
-*   “Geo Map” in the Trilium Demo section would not show up properly.
-*   Printing/exporting to PDF triggers twice.
-*   Desktop: “Port is already used” when opening multiple instances of Trilium.
-*   .deb for ARM is not opening by @linull24
-*   Branch prefix initial value not shown
-*   Blur not working properly for the global menu.
-*   [Note content replaced by Excalidraw JSON when switching notes](https://github.com/TriliumNext/Trilium/issues/6788)
+*   Zen mode: note buttons visible in zen mode.
+*   Deleting a bulk action would execute all bulk actions
+*   [Focus resets to start of note after adding inline link](https://github.com/TriliumNext/Trilium/issues/7115)
+*   [Zen mode doesn't increase web view size](https://github.com/TriliumNext/Trilium/issues/6972) by @Papierkorb2292
+*   [Shortcut keys without modifiers affecting normal usage](https://github.com/TriliumNext/Trilium/issues/7121)
+*   Missing ribbon widgets section in Appearance
+*   Split button visible while printing
+*   Unable to search in read-only code notes
+*   [LLM chat: conversation not visible on Firefox](https://github.com/TriliumNext/Trilium/issues/5762)
+*   [Mind map affecting the use of the space bar in the entire app](https://github.com/TriliumNext/Trilium/issues/7170)
 
 ## ✨ Improvements
 
-*   In Basic Properties:
-    *   Added a modal to easily configure the code note types from the note type dropdown, without going through settings.
-    *   Added a modal to content languages to easily configure the languages, without going through settings.
-*   The list of text snippets now displays the actual note icon and color.
-*   Minor improvements to the API log.
-*   Improve window background effects by @adoriandoran
-*   Theme improvements by @adoriandoran
-*   Add an option to disable smooth scrolling for the Electron app by @adoriandoran
-*   [Revisions dialog can optionally display the source diff between revisions](https://github.com/TriliumNext/Trilium/pull/6887) by @SiriusXT
-*   Splits are now resizable by @SiriusXT
-*   Improvements to collections:
-    *   Geomap: Add a notification if book is locked while dragging.
-    *   Table: Disable insert at position if sorting.
-    *   Board
-        *   Improve dragging experience for both columns and notes.
-        *   Adding notes has been reworked so that it doesn't add the note first.
-        *   Pressing escape while adding a note will dismiss it instead of adding an empty note.
-        *   Note titles can be edited directly from the board by hovering the card with the mouse and clicking the edit button next to them.
-        *   When editing, the note titles will now be displayed multi-line, to better match the end result.
-        *   Slight style improvements (smoother shadows, no shift).
-        *   Context menu option to archive/unarchive current item.
-    *   All the collections (geo map, calendar, board, table) now indicate archived notes by greying out the item.
-    *   Added an option to display archived notes in collection via the Collection Properties tab in the ribbon.
-*   The note ID in the Note info tab is now shown in monospace font.
-*   Context menu option in the note tree to archive/unarchive a note.
-*   Improve performance of collapsing subtrees by @werererer
-*   Create a more seamless PWA top bar by @qwreey
-*   [Default to hiding file details when opening a PDF note](https://github.com/TriliumNext/Trilium/issues/6873)
-*   Disable bold and italic from the highlights list for new users.
-*   Slash commands can now be disabled from Options → Text Notes → Features.
-*   Added a description for the editor features in Text Note options.
-
-## 🌍 Internationalization
-
-*   Various translation updates.
+*   [Make splits resizable while in Zen Mode](https://github.com/TriliumNext/Trilium/issues/7093)
+*   [Use number sorting for number columns in Table view](https://github.com/TriliumNext/Trilium/pull/7094) by @Mystler
+*   Improvements to the display of the toast notifications.
+*   Websocket connection errors are now displayed as a toast.
+*   Math equations can be customised, in text size, text color and background color.
 
 ## 🛠️ Technical updates
 
-*   We've made some changes to our development environment as **we moved away from NX**. If you are developer working on Trilium, check [the PR](https://github.com/TriliumNext/Trilium/pull/6842) for more information.
-*   Some important UI components such as the ribbon, note actions, floating buttons and the note title, SQL console, search results, some menus have been ported to React. **Please report any issues you might encounter.**
-*   [Fixed missing TOTP verification for /login/token](https://github.com/TriliumNext/Trilium/pull/6823) by @Nriver
-*   Improved the format of the server startup message.
-*   Thanks to @FliegendeWurst for helping with fixing the Nix flakes after we changed our development environment.
-
-## 🔒️ Security fixes
-
-*   [CVE-2025-58754](https://redirect.github.com/axios/axios/security/advisories/GHSA-4hjh-wcwx-xvwj) affecting Axios (currently only used for backend scripts).
-*   CVE-2025-58064 in the text editor (CKEditor)
+*   Update Electron to v38
+*   Fixed an event leak in modals.
+*   Replace `jsdom` with `node-html-parser`
