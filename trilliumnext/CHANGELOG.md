@@ -1,4 +1,8 @@
 # v0.99.2
+
+> [!NOTE]
+> If you are interested in an [official mobile application](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/7447)  ([#7447](https://github.com/TriliumNext/Trilium/issues/7447)) or [multi-user support](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/4956) ([#4956](https://github.com/TriliumNext/Trilium/issues/4956)), consider offering financial support via IssueHunt (see links).
+
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
@@ -49,6 +53,7 @@
 *   Allow any date for first day of the week by @werererer
 *   Searches now have the _Collection Properties_ tab, to change the display mode from a list to one of the collections.
 *   [Clarify importing .zip structures when importing notes](https://github.com/TriliumNext/Trilium/issues/7429)
+*   [Style overhaul for the Canvas note type](https://github.com/TriliumNext/Trilium/pull/7372) by @adoriandoran
 
 ## 📖 Documentation
 
