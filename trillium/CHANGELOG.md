@@ -1,65 +1,36 @@
-# v0.99.2
+# v0.99.3
+> [!NOTE]
+> If you are interested in an [official mobile application](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/7447)  ([#7447](https://github.com/TriliumNext/Trilium/issues/7447)) or [multi-user support](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/4956) ([#4956](https://github.com/TriliumNext/Trilium/issues/4956)), consider offering financial support via IssueHunt (see links).
+
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
 > *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
-## 💡 Key highlights
-
-*   Presentations can now be created directly from within Trilium, including being able to present in full screen.
-    *   Presentations are a new type of collections.
-    *   For more information, consult the in-app documentation or the [online documentation](https://docs.triliumnotes.org/User%20Guide/User%20Guide/Note%20Types/Collections/Presentation%20View.html).
-*   The whole printing mechanism was redesigned from ground up.
-    *   This should translate to more stable printing or exporting to PDF across note types.
-    *   The new Presentation collection can also be exported as PDF.
-    *   For more information, consult the [documentation](https://docs.triliumnotes.org/User%20Guide/User%20Guide/Basic%20Concepts%20and%20Features/Notes/Printing%20%2526%20Exporting%20as%20PDF.html).
-
 ## 🐞 Bugfixes
 
-*   Relation map: floating buttons stuck when showing source.
-*   [Mobile formatting toolbar appears cut off.](https://github.com/TriliumNext/Trilium/issues/7206)
-*   [Table View Max nesting depth not working](https://github.com/TriliumNext/Trilium/issues/7204)
-*   [Expand and Collapse buttons only work on refresh](https://github.com/TriliumNext/Trilium/issues/7209)
-*   <kbd>Enter</kbd> not working on Quick Search.
-*   Modifying an equation would reset its size, foreground color and background color.
-*   [Instances of Built-in Templates inherit `#excludeFromNoteMap`](https://github.com/TriliumNext/Trilium/issues/7187)
-*   [Background effects on Windows 11 were affected by custom title bar selection.](https://github.com/TriliumNext/Trilium/commit/5d8f789791f699d06e49123e672b1ad62b1d7ee7#commitcomment-165811641)
-*   [When creating a new note in the calendar view, the default name is not selected by default](https://github.com/TriliumNext/Trilium/issues/7289)
-*   [Wrong focus in protected session dialog](https://github.com/TriliumNext/Trilium/issues/7251)
-*   [Title bar buttons not centered on macOS](https://github.com/TriliumNext/Trilium/issues/7257)
-*   [Notes with children in collection list view are displayed twice](https://github.com/TriliumNext/Trilium/issues/7301)
-*   [The background color of a table's header remains black](https://github.com/TriliumNext/Trilium/issues/7230)
-*   [Keep the color of the note titles even after selection in the new theme](https://github.com/TriliumNext/Trilium/issues/3634) by @adoriandoran
-*   Search results:
-    *   Collection would appear twice.
-    *   Infinite recursion issues due to nesting, when using collections such as table.
-    *   [Note path was no longer displayed.](https://github.com/TriliumNext/Trilium/issues/7404)
-    *   All collection types are now supported by the search.
-*   Importing notes without selection imports previous selection
-*   [Failed to connect to Wayland display: No such file or directory](https://github.com/TriliumNext/Trilium/issues/7208)
-
-## ✨ Improvements
-
-*   Board view enhancements:
-    *   Basic keyboard interaction using <kbd>Tab</kbd> and <kbd>Shift</kbd>+<kbd>Tab</kbd> (consult the User Guide).
-    *   The column title is now visible even if the column is scrolled.
-*   Custom HTML snippets in shared pages by @kleutzinger
-*   Text notes: [Allow accessing `obsidian:` links](https://github.com/TriliumNext/Trilium/issues/7207)
-*   Allow any date for first day of the week by @werererer
-*   Searches now have the _Collection Properties_ tab, to change the display mode from a list to one of the collections.
-*   [Clarify importing .zip structures when importing notes](https://github.com/TriliumNext/Trilium/issues/7429)
+*   [Issues with the ribbon and some about dialogs when formatting locale is set to Chinese](https://github.com/TriliumNext/Trilium/issues/7444)
+*   Incorrect date format for Chinese.
+*   Development locale appearing in production.
+*   Split reverted on right-to-left languages
+*   Fixes for the Flatpak installation method:
+    *   [Flatpak Data Access Issue on install/update : permission issue](https://github.com/TriliumNext/Trilium/issues/7454)
+    *   [flatpak doesn't launch after install, needs no-sandbox](https://github.com/TriliumNext/Trilium/issues/5516)
+    *   Icon missing in Flatpak shortcut.
+*   [Trilium does not unlock after autolock](https://github.com/TriliumNext/Trilium/issues/7448) by @perfectra1n
+*   Note color not taken into consideration for reference links by @adoriandoran
+*   [Board view doesn't respond to Color tags](https://github.com/TriliumNext/Trilium/issues/7456) by @adoriandoran
 
 ## 📖 Documentation
 
-*   Various improvements and clarifications.
+*   Improve links & starting page in demo note by @tredondo
 
 ## 🌍 Internationalization
 
-*   Support for Portuguese (Portugal).
-*   Support for Arabic.
+*   Added support for Italian
+*   Various translation improvements.
 
 ## 🛠️ Technical updates
 
-*   Fixed Nix flake.
-*   Preliminary support for right-to-left languages for the UI.
+*   Various dependency updates.
