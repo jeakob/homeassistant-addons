@@ -1,6 +1,6 @@
 # build.yaml
 build_from:
-  amd64: docker.io/triliumnext/trilium:v0.99.3
-  aarch64: docker.io/triliumnext/trilium:v0.99.3
+  amd64: docker.io/triliumnext/trilium:v0.99.4
+  aarch64: docker.io/triliumnext/trilium:v0.99.4
 args:
   BUILD_ARCH: "${BUILD_ARCH}"
