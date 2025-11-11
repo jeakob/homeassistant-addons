@@ -1,4 +1,7 @@
 # v0.99.4
+> [!WARNING]
+> The ZIP version of the server fails to run due to a Node.js upgrade, see #7674. Docker and desktop versions are not affected.
+
 > [!NOTE]
 > If you are interested in an [official mobile application](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/7447)  ([#7447](https://github.com/TriliumNext/Trilium/issues/7447)) or [multi-user support](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/4956) ([#4956](https://github.com/TriliumNext/Trilium/issues/4956)), consider offering financial support via IssueHunt (see links).
 
