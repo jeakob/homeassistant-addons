@@ -1,4 +1,7 @@
 # v0.100.0
+> [!WARNING]
+> If you are using the Traefik reverse proxy with your server, there is a breaking change in Traefik that will cause [HTTP 400 errors](https://github.com/TriliumNext/Trilium/issues/7968). See the [relevant section in the documentation](https://docs.triliumnotes.org/user-guide/setup/server/reverse-proxy/traefik#breaking-change-in-traefik-3-6-4) for more information.
+
 > [!NOTE]
 > If you are interested in an [official mobile application](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/7447)  ([#7447](https://github.com/TriliumNext/Trilium/issues/7447)) or [multi-user support](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/4956) ([#4956](https://github.com/TriliumNext/Trilium/issues/4956)), consider offering financial support via IssueHunt (see links).
 
