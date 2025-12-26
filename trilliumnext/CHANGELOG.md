@@ -1,9 +1,6 @@
-# v0.100.0
-> [!WARNING]
-> If you are using the Traefik reverse proxy with your server, there is a breaking change in Traefik that will cause [HTTP 400 errors](https://github.com/TriliumNext/Trilium/issues/7968). See the [relevant section in the documentation](https://docs.triliumnotes.org/user-guide/setup/server/reverse-proxy/traefik#breaking-change-in-traefik-3-6-4) for more information.
-
+# v0.101.0
 > [!NOTE]
-> If you are interested in an [official mobile application](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/7447)  ([#7447](https://github.com/TriliumNext/Trilium/issues/7447)) or [multi-user support](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/4956) ([#4956](https://github.com/TriliumNext/Trilium/issues/4956)), consider offering financial support via IssueHunt (see links).
+> This release marks the 8-year anniversary of Trilium, celebrating its [first public release](https://github.com/TriliumNext/Trilium/releases/tag/v0.0.9) on December 25th, 2017.  
 
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
@@ -13,152 +10,81 @@
 
 ## 💡 Key highlights
 
-*   [Allow changing note color from tree](https://github.com/TriliumNext/Trilium/issues/4137) by @adoriandoran
-*   More Collection types can now be printed or exported to PDF:
-    *   List collections which will render in a book-like fashion with all its children and preserving the note hierarchy, with functional table of contents and links (for PDFs).
-    *   Table collections will now render a printable table.
-    *   See [documentation](https://docs.triliumnotes.org/user-guide/concepts/notes/printing-and-pdf-export#printing-multiple-notes) for more info.
-*   Board view improvements
-    *   The number of items in each column is now displayed.
-    *   Attributes (labels & relations) can now be displayed for each note using promoted attributes, consult the documentation for information on how to do so.
-*   Mobile now has basic support for splits (maximum of two), laid out vertically for smartphones.
-*   **Breaking change**: `#calendar:color` was completely removed in favor of the global `#color` attribute.
+*   A new layout was introduced which heavily changes both existing UI elements, as well as adds some new ones (by @eliandoran and @adoriandoran, with special thanks for @rom1dep for the valuable suggestions).
+    *   The goal of this new layout is to modernize the application and to make it more intuitive but at the same time to reduce clutter.
+    *   See [documentation](https://docs.triliumnotes.org/user-guide/concepts/ui/New%20Layout) of the changes and the new UI elements.
+    *   Notes can be more easily navigated across the hierarchy using the breadcrumbs displayed underneath the tab bar.
+    *   The old layout can still be used, for now. Feedback is welcome.
+*   Near the tab bar now there are [built-in buttons to go the previous or the next note in history](https://github.com/TriliumNext/Trilium/pull/8003/files) (only if the back/forward buttons are not already placed in the launch bar).
+*   **Scripting overhaul:** Custom widgets and Render note can now be written in Preact using JSX instead of the legacy format (jQuery + custom component framework). For more information, see [documentation on Preact in Trilium](https://docs.triliumnotes.org/user-guide/scripts/frontend-basics/Preact).
 
 ## 🐞 Bugfixes
 
-*   [Advanced search may return more results](https://github.com/TriliumNext/Trilium/issues/7706) by @perfectra1n
-*   [Fix enex import stores wrong format in database for dateCreated, dateModified](https://github.com/TriliumNext/Trilium/pull/7718) by @contributor
-*   [Custom Global Shortcut for Toggle System Tray Icon Fails to Show Window](https://github.com/TriliumNext/Trilium/issues/7730) by @contributor
-*   [Fix NoteLink component is unable to display path for root note](https://github.com/TriliumNext/Trilium/pull/7736) by @contributor
-*   [file: protocol not working on Linux](https://github.com/TriliumNext/Trilium/issues/6696) by @laundmo
-*   [Can't type proper value in font size inputbox in Appearance tab in Configuration](https://github.com/TriliumNext/Trilium/issues/7740)
-*   [#top/#bottom reversed when #sortDirection=desc](https://github.com/TriliumNext/Trilium/issues/7716)
-*   [Deleting note from journal not working](https://github.com/TriliumNext/Trilium/issues/7702)
-*   Fixes in the share functionality:
-    *   [Inline mermaid diagrams not rendering](https://github.com/TriliumNext/Trilium/issues/7765)
-    *   [Share url can be broken because of extra slash](https://github.com/TriliumNext/Trilium/pull/7779) by @contributor
-    *   [Invalid code formatting caused by unescaped HTML](https://github.com/TriliumNext/Trilium/issues/7783)
-    *   [`#shareHiddenFromTree` does not hide link in the footer](https://github.com/TriliumNext/Trilium/issues/7781)
-    *   [Title of protected note is visible when linked into shared note](https://github.com/TriliumNext/Trilium/issues/4801)
-*   [Scripting: Right Pane Widget example produces error](https://github.com/TriliumNext/Trilium/issues/7778)
-*   [The WebView note type is not passed through template notes](https://github.com/TriliumNext/Trilium/issues/7557)
-*   [\[MIME type error\] Browser blocks loading print.css (application/json)](https://github.com/TriliumNext/Trilium/issues/7772)
-*   [Overly narrow empty tab layout on mobile](https://github.com/TriliumNext/Trilium/pull/7824) by @SiriusXT
-*   Printing:
-    *   “Print job canceled" error message when dismissing.
-    *   Included notes not rendered.
-*   Quick edit:
-    *   Keyboard shortcuts not always working.
-    *   [Quick view of dateNote in calendar doesn't respect readOnly status](https://github.com/TriliumNext/Trilium/issues/7715)
-*   Promoted attributes: some labels would redirect to the wrong input box.
-*   Attachments:
-    *   [PDF viewer displays abnormally](https://github.com/TriliumNext/Trilium/issues/7847)
-    *   Newly uploaded attachments don't display their size.
-*   [Search selected text in Trilium](https://github.com/TriliumNext/Trilium/pull/7859) by @contributor
-*   Collections
-    *   [Collection/Table Breaks with Colon within Attribute Name](https://github.com/TriliumNext/Trilium/issues/7860)
-    *   All descendant notes displayed in List/Grid when switching views.
-    *   Geomap:
-        *   Map not loading at the lowest zoom.
-        *   [Markers are not colored](https://github.com/TriliumNext/Trilium/issues/7920).
-        *   Infinite scroll is now disabled to avoid issues with markers disappearing.
-    *   Board:
-        *   Columns leaking when switching between two different collections of the same type.
-        *   Unable to press Escape to dismiss adding a new column.
-        *   Changing `board:groupBy` doesn't refresh the board.
-    *   Calendar: events sometimes not refreshing.
-*   MacOS:
-    *   [ForwardInNoteHistory and backInNoteHistory shortcuts clobber system functionality](https://github.com/TriliumNext/Trilium/issues/3708)
-    *   [Unable to use CMD+UpArrow / CMD+DownArrow hotkeys within the note](https://github.com/TriliumNext/Trilium/issues/6964)
-*   Mobile:
-    *   Some context menu would hide when tapping on submenus.
-    *   Classic toolbar in Quick Edit would not open dropdowns properly.
-    *   Keyboard shortcut + symbol shown in global menu
-*   Calendar in launch bar:
-    *   The month popup would still be shown after changing the year.
-    *   Clicking on the edges of the calendar would dismiss the popup.
-    *   Tooltip showing over the calendar drop-down
-*   [Focus issues within split pane](https://github.com/TriliumNext/Trilium/pull/7877) by @SiriusXT
-*   Read-only bar displayed when accessing note attachments.
-*   [Edited Notes tab hidden by fixed formatting toolbar](https://github.com/TriliumNext/Trilium/issues/7900)
-*   Backlinks not refreshed after inserting a new link
-*   [Text color unreadable in the Calendar](https://github.com/TriliumNext/Trilium/issues/7569) by @adoriandoran
-*   [Math duplicates itself in code blocks](https://github.com/TriliumNext/Trilium/issues/7913)
-*   [Show 'import successful' when canceling markdown import](https://github.com/TriliumNext/Trilium/pull/7899) by @SiriusXT
-*   Switching an existing note (with children) to mindmap type will still display preview cards for its children.
-*   Clarify converting notes to attachments in tree context menu (better message, disable option when not supported).
-*   Note actions: some menu items disabled when switching note type.
-*   [Note map: map overflows when switching type in ribbon](https://github.com/TriliumNext/Trilium/pull/7939) by @SiriusXT
+*   [Ctrl+F when a dialog is open opens different search dialog](https://github.com/TriliumNext/Trilium/issues/5735)
+*   Toast: Icon missing for error messages
+*   Launch bar calendar would jump to the wrong week note if it was in between years.
+*   Launch bar calendar month selector was wrongly positioned.
+*   Tooltips would sometimes be duplicated if an element is focused.
+*   Text notes:
+    *   Missing padding in `<pre>` without `<code>`.
+    *   [Content disappears when inserting code block via Markdown formatting](https://github.com/TriliumNext/Trilium/issues/5776)
+    *   [Data loss for opened tabs after CKEditor crash](https://github.com/TriliumNext/Trilium/issues/7739)
+*   [Mind Map export does not show text in links between nodes](https://github.com/TriliumNext/Trilium/issues/7829) by @lzinga
+*   Webview: Layout issues when no source site is set.
+*   Incorrect help button for content language.
+*   Links in inherited attributes not underlined.
+*   Mermaid preview did not render full-height if in read-only while in vertical layout.
+*   Icons: `border-left` icon was missing.
+*   Auto-complete shows empty name for hoisted note.
+*   [Missing null check for canvas elements in fulltext search](https://github.com/TriliumNext/Trilium/pull/8090) by @Soein
+*   Share badge would always indicate “Shared locally” when accessing the server version.
+*   Clicking in the outer area of a menu dismisses it.
+*   Geomap: street names not rendering in vector maps.
+*   In code options modal (ribbon), the tooltip is behind the modal.
+*   [Archived deeply nested notes appear in classic collections without #includeArchived](https://github.com/TriliumNext/Trilium/issues/8127)
+*   [Grid collection not displaying images properly](https://github.com/TriliumNext/Trilium/issues/7969)
+*   Printing collections: skip protected notes (if they are not unlocked) and files.
+*   [Attachment auto-deletion displayed time is off by a factor of 1000](https://github.com/TriliumNext/Trilium/issues/7987)
+*   [Note title color for legacy themes](https://github.com/TriliumNext/Trilium/pull/7997) by @Nriver
+*   [First input box of the promoted multi relation edits last relation](https://github.com/TriliumNext/Trilium/issues/7992)
 
 ## ✨ Improvements
 
-*   Additional floating buttons
-    *   Image notes now have a “Copy reference to image” but⁸ton
-    *   Render notes have a “Refresh” button.
-*   Render notes are now searchable.
-*   Mind map & canvas notes now support read-only mode.
-*   View source prettifies all JSON content.
-*   [Note info ribbon flex layout](https://github.com/TriliumNext/Trilium/pull/7678)  by @contributor
-*   ["Open note on server" menu item](https://github.com/TriliumNext/Trilium/pull/7477) by @contributor
-*   Board view: warn if trying to add a column that already exists.
-*   [Hide archived notes in classic collections](https://github.com/TriliumNext/Trilium/issues/7705)
-*   Next theme: a different background color on mobile (white on light theme).
-*   In-app-help: render reference links with icon.
-*   [Calendar: Ability to lock the calendar to a specific date](https://github.com/TriliumNext/Trilium/issues/7691)  by @dherrerace
-*   [Option to close any of the panes from 2 open panes](https://github.com/TriliumNext/Trilium/issues/4511)
-*   Presentation: display no children warning when empty.
-*   [Tree: Keep moved notes always visible](https://github.com/TriliumNext/Trilium/pull/7776) by @SiriusXT
-*   Share: display note icon in reference links.
-*   Printing improvements:
-    *   Render inline Mermaid in Text notes.
-    *   Display progress of printing and exporting to PDF when working with Presentation or List collections.
-*   [Strike Through Font on Completed To-do Items](https://github.com/TriliumNext/Trilium/issues/4269)
-*   Promoted attributes:
-    *   Label auto-complete now works on mobile as well.
-    *   Debouncing changes to avoid updating the server too many times while typing.
-*   [Configurable CORP (resource policy)](https://github.com/TriliumNext/Trilium/issues/7826) by @lzinga
-*   Code notes options: display a tooltip with the syntax highlighting support for each language.
-*   Quick edit:
-    *   Improve the layout of code notes and Mermaid notes.
-    *   Floating buttons are now displayed inside the popup.
-    *   Smoothly reacts to changes in color.
-    *   Button to open the note in full view (new tab).
-*   New MIME types supported (including syntax highlighting):
-    *   [KDL](https://github.com/TriliumNext/Trilium/issues/7848)
-    *   [SAP ABAP](https://github.com/TriliumNext/Trilium/issues/7851)
-*   [Option to expand n-level subnotes in list view](https://github.com/TriliumNext/Trilium/issues/7669)
-*   macOS: Tabs no longer leave a gap when full screen is enabled.
-*   [Format brush](https://github.com/TriliumNext/Trilium/issues/4848) by @SiriusXT
-*   Mobile:
-    *   Context menus are bigger and easier to use.
-    *   Improved the layout of the note revisions dialog.
-*   Calendar has a new design for the events that better supports colors by @adoriandoran
-*   Minor improvements to the list of attachments.
-*   Various UI improvements by @adoriandoran
-*   Scripting improvements:
-    *   [Day.js `duration` plugin is now included](https://github.com/TriliumNext/Trilium/issues/4456)
-    *   Both back-end and front-end plugins now share the same Day.js configuration, including plugins and locale.
-*   Promoted attributes not reacting to changes in inheritable attributes.
-*   [Disable spell-check on code-snippets](https://github.com/TriliumNext/Trilium/issues/7894) by @lzinga
+*   Improved error handling for custom widgets.
+*   Launch bar:
+    *   The horizontal launch bar can now be scrolled simply by scrolling the mouse wheel.
+    *   Tooltips are shown faster (no fade).
+*   Improved error handling
+    *   HTTP errors are now more user-friendly.
+    *   Warn on Traefik request failures.
+    *   CKEditor crashes are notified, including an easy way to provide information for error reports.
+*   Hide ribbon in Options.
+*   Removed margins and rounded corners for the code editor.
+*   Backend logs: reduced extra padding & decrease font size for readability.
+*   Improved error handling for custom widgets.
+*   Code notes will now have a default icon based on the language (e.g. custom icon for JS code notes). Only a subset of languages have a dedicated icon.
+*   Printing collections will now display a message if one or more notes are not printable.
+*   UI improvements by @adoriandoran
 
 ## 📖 Documentation
 
-*   [Add Traefik configuration documentation](https://github.com/TriliumNext/Trilium/pull/7769) by @andreasntr
+*   [Wrong links in README](https://github.com/TriliumNext/Trilium/issues/7246)
+*   [Improve organization of links](https://github.com/TriliumNext/Trilium/pull/8057)
+*   Widget scripts are now better documented, in both the legacy (jQuery) and Preact/JSX format.
 
 ## 🌍 Internationalization
 
-*   Text editor (CKEditor) now respects the user language.
-*   Canvas (Excalidraw) also respects user language.
-*   Mindmap notes also respect user notes.
-*   Two dialog messages not translated.
-*   Added English (United Kingdom). Mostly for the formatting, but translations are welcome (handling the differences between the base US translation and UK).
-*   Proper plural support for Backlinks.
-*   `dayjs` locale is now set on the client.
+*   Untranslated error message for custom widgets.
 
 ## 🛠️ Technical updates
 
-*   Type widgets (the code behind note types such as text, code) was rewritten in React. **Feel free to report any issues you may find**.
-*   [Add class name to content-header](https://github.com/TriliumNext/Trilium/pull/7713) by @SiriusXT
-*   Upgrade flake to Node 24 by @FliegendeWurst
-*   [better-sqlite3 error on nightly build](https://github.com/TriliumNext/Trilium/issues/7839)
-*   [Add comprehensive AI coding agent instructions for copilot-instructions](https://github.com/TriliumNext/Trilium/pull/7917) by @lzinga
+*   Ported the following components to React. If you notice any issues with your launchers or the bar itself, feel free to report them.
+    *   The launch bar and all its widgets.
+    *   The toast/notification system.
+*   [Add dev shell and direnv support](https://github.com/TriliumNext/Trilium/pull/8011) by @yzx9 and @contributor
+*   **Minor breaking change**: custom widgets using the typo `node-detail-pane` will not be supported anymore. Use `note-detail-pane` instead.
+*   [ETAPI OpenAPI: Add missing share format](https://github.com/TriliumNext/Trilium/pull/8125) by @kalbasit
+
+## 🔒️ Security fixes
+
+*   A security vulnerability was reported by @sivaadityacoder and fixed by @perfectra1n. More information to be provided in around a month.
