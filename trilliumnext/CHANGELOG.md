@@ -1,6 +1,6 @@
-# v0.101.0
+# v0.101.1
 > [!NOTE]
-> This release marks the 8-year anniversary of Trilium, celebrating its [first public release](https://github.com/TriliumNext/Trilium/releases/tag/v0.0.9) on December 25th, 2017.  
+> This is a hotfix for yesterday's release, which marked the 8-year anniversary of Trilium, celebrating its [first public release](https://github.com/TriliumNext/Trilium/releases/tag/v0.0.9) on December 25th, 2017.  
 
 > [!IMPORTANT]
 > If you enjoyed this release, consider showing a token of appreciation by:
@@ -12,13 +12,23 @@
 
 *   A new layout was introduced which heavily changes both existing UI elements, as well as adds some new ones (by @eliandoran and @adoriandoran, with special thanks for @rom1dep for the valuable suggestions).
     *   The goal of this new layout is to modernize the application and to make it more intuitive but at the same time to reduce clutter.
-    *   See [documentation](https://docs.triliumnotes.org/user-guide/concepts/ui/New%20Layout) of the changes and the new UI elements.
+    *   See [documentation](https://docs.triliumnotes.org/user-guide/concepts/ui/new-layout) of the changes and the new UI elements.
     *   Notes can be more easily navigated across the hierarchy using the breadcrumbs displayed underneath the tab bar.
     *   The old layout can still be used, for now. Feedback is welcome.
 *   Near the tab bar now there are [built-in buttons to go the previous or the next note in history](https://github.com/TriliumNext/Trilium/pull/8003/files) (only if the back/forward buttons are not already placed in the launch bar).
 *   **Scripting overhaul:** Custom widgets and Render note can now be written in Preact using JSX instead of the legacy format (jQuery + custom component framework). For more information, see [documentation on Preact in Trilium](https://docs.triliumnotes.org/user-guide/scripts/frontend-basics/Preact).
 
-## 🐞 Bugfixes
+## 🐞 New bugfixes in v0.101.1
+
+*   [Right pane toggle missing on macOS vertical layout](https://github.com/TriliumNext/Trilium/issues/8157)
+*   [Launchpad Note Launcher hoisting no longer working](https://github.com/TriliumNext/Trilium/issues/8160)
+*   Toggle right pane keyboard button not working on new layout
+*   [Tabs do not appear when using vertical layout and legacy theme](https://github.com/TriliumNext/Trilium/issues/8170) by @adoriandoran
+*   [Text in headings do not respond to being bolded](https://github.com/TriliumNext/Trilium/issues/8177) by @adoriandoran
+*   Table of contents in new layout: not displaying correctly on first render.
+*   [The text editor keeps crashing in non-HTTPS](https://github.com/TriliumNext/Trilium/issues/8165)
+
+## 🐞 Bugfixes in v0.101.0
 
 *   [Ctrl+F when a dialog is open opens different search dialog](https://github.com/TriliumNext/Trilium/issues/5735)
 *   Toast: Icon missing for error messages
