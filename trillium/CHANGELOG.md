@@ -1,4 +1,9 @@
-# v0.102.1
+# v0.102.2
+> [!IMPORTANT]
+> **This release contains important security fixes. All users are strongly encouraged to update immediately.**
+> 
+> Several vulnerabilities affecting content handling and the desktop application have been addressed. We recommend upgrading before the next scheduled release to ensure your installation is protected.
+
 > [!NOTE]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
@@ -6,17 +11,27 @@
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 > *   If you are interested in an [official mobile application](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/7447)  ([#7447](https://github.com/TriliumNext/Trilium/issues/7447)) or [multi-user support](https://oss.issuehunt.io/r/TriliumNext/Trilium/issues/4956) ([#4956](https://github.com/TriliumNext/Trilium/issues/4956)), consider offering financial support via IssueHunt (see links).
 
-> [!IMPORTANT]
-> This is a hotfix of v0.102.0, addressing some blocking issues. For more information about the previous major version, see [v0.102.0 changelog](https://github.com/TriliumNext/Trilium/releases/tag/v0.102.0).
+## 🔒️ Security improvements
 
-## 🐞 Bugfixes
+*   Content Handling
+    
+    *   Improved request handling for SVG content in share routes
+    *   Improved request handling for SVG content in the main API
+    *   Enhanced content rendering in the Mermaid diagram editor
+    *   Fixed toast notifications to properly escape content
+    *   Added validation for the `docName` attribute in the document renderer
+    *   Marked `docName` as a sensitive attribute in the commons module
+*   Desktop Application (Electron)
+    
+    *   Added Electron fuses to harden the desktop application against external abuse
+    *   Improved application integrity checks
+*   API & Import
+    
+    *   Added MIME type validation for image uploads via ETAPI
+    *   Aligned attachment upload validation with note upload validation
+    *   Import no longer preserves named note IDs to prevent potential conflicts
+*   Authentication
+    
+    *   OpenID Connect now uses a more secure random number generator
 
-*   [Mind Map feature breaks rendering in v0.102.0](https://github.com/TriliumNext/Trilium/issues/8879)
-*   Fixes for the PDF viewer:
-    *   [PDF view is '403 Forbidden' on Nginx Proxy Manager](https://github.com/TriliumNext/Trilium/issues/8877)
-    *   [PDF: address some layout issues](https://github.com/TriliumNext/Trilium/commit/8712e7dd160564f9a923a88bf5871e63c79d40f0) by @adoriandoran
-    *   Cache not properly invalidated across versions.
-
-## 🛠️ Technical updates
-
-*   [Rework Docker infrastructure to use crane](https://github.com/TriliumNext/Trilium/pull/8869) by @perfectra1n
+We've also updated our SECURITY.MD file to detail our security practices and how to report vulnerabilities.
