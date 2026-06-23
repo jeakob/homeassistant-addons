@@ -1,9 +1,9 @@
 {
   "github_fulltag": "true",
-  "last_update": "22-06-2026",
+  "last_update": "23-06-2026",
   "repository": "jeakob/homeassistant-addons",
   "slug": "triliumnext",
   "source": "github",
   "upstream_repo": "triliumnext/trilium",
-  "upstream_version": "v0.103.0"
+  "upstream_version": "v0.95.0"
 }
