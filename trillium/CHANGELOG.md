@@ -1,225 +1,370 @@
-# v0.103.0
 > [!NOTE]
 > If you enjoyed this release, consider showing a token of appreciation by:
 > 
 > *   Pressing the “Star” button on [GitHub](https://github.com/TriliumNext/Trilium) (top-right).
 > *   Considering a one-time or recurrent donation to the [lead developer](https://github.com/eliandoran) via [GitHub Sponsors](https://github.com/sponsors/eliandoran) or [PayPal](https://paypal.me/eliandoran).
 
-> [!IMPORTANT]
-> Due to the introduction of new note types (spreadsheet) and the OCR feature, the database and sync versions have been increased. This means that both the desktop and the server need an upgrade in order to continue syncing.
+This release is the largest in Trilium's history, built around two big themes: **security** and **interoperability**. The attack surface has been dramatically reduced across the desktop app, the server, and shared notes — with 16 dedicated security fixes and a few deliberate breaking changes (backend scripting and the SQL console are now disabled by default), so please review the Breaking changes section before upgrading.
 
-> [!WARNING]
-> The Windows binary has received a certificate upgrade which means that you might get SmartScreen warnings depending on how you install the application. This is already a [known issue](https://github.com/TriliumNext/Trilium/issues/9548), the workaround is to right click the installer → Properties and check the security box at the bottom of the window.
+Getting notes in and out of Trilium is also much easier: new importers for OneNote, Notion, Google Keep, Anytype and Obsidian join a faster, more memory-efficient import/export pipeline and Spreadsheet now has XLSX and CSV import & export.
+
+On top of that come a redesigned setup and login experience, better AI integration (including being able to use your **Claude Code subscription**), richer text editing (multi-state TODO lists, collapsible blocks, link previews), dashboard collections, and a huge wave of polish — roughly 86 bugfixes and 68 smaller improvements touching nearly every corner of the app. The sections below have the full details.
 
 ## 💡 Key highlights
 
-1.  A long-awaited note type is now supported: Spreadsheets, allowing for a familiar (Excel-like) editing experience with formulas, powered by Univer Sheets.
-    *   Support for it is considered beta and it might face some changes along the way.
-    *   See [the documentation](https://docs.triliumnotes.org/user-guide/note-types/Spreadsheets) for important aspects to consider when using spreadsheets.
-2.  [Basic Markdown support with preview and sync scrolling.](https://docs.triliumnotes.org/user-guide/note-types/markdown)
-3.  Built-in OCR support for images, but also PDF and Office (Word, PowerPoint, Spreadsheet) text extraction which integrates with the search function. See the _Media_ page in Options for configuration.
-4.  [Custom dictionary is now synchronized across instances](https://github.com/TriliumNext/Trilium/issues/1801)
-5.  [New deployment for Linux under test: AppImage](https://github.com/TriliumNext/Trilium/issues/409)
-6.  Bookmarks in text notes were overhauled
-    *   _Bookmarks_ were renamed to _Anchors_ in order not to overlap with the concept of bookmarked notes in Trilium.
-    *   Anchors can now be used across notes as they are integrated into the _Add link_ feature. See documentation for more information.
-    *   Added a corresponding slash command to make it easy to introduce new anchors.
-7.  We are [reintroducing an LLM chat functionality](https://docs.triliumnotes.org/user-guide/llm#reintroduction-in-v0-103-0) with full-size chats as well as a sidebar with tools that allow it to alter your notes or even create scripts.
+1.  Setup was redesigned from scratch to be more modern (see details below).
+2.  The LLM integration **can now use your Claude Code subscription**, without the need of an API key or additional cost.
+3.  [Text notes: Customizable multi-state TODO lists](https://github.com/TriliumNext/Trilium/pull/9881) by @adoriandoran
+4.  [Collapsible blocks](https://github.com/TriliumNext/Trilium/pull/9965) by @adoriandoran
+5.  [Link previews](https://github.com/TriliumNext/Trilium/pull/9188) by @stexz01, @eliandoran and @adoriandoran
+6.  [Toggle List (aka Accordion)](https://github.com/TriliumNext/Trilium/issues/9914) by @adoriandoran
+7.  [Text notes: Collapsible bullets](https://github.com/TriliumNext/Trilium/issues/1850)
+8.  Spreadsheet gains XLSX and CSV import & export
+9.  A new experimental [Dashboard collection](https://docs.triliumnotes.org/user-guide/collections/dashboard).
+10.  Auto theme switching for code blocks and code notes
+11.  [Autocompletion (e.g. Intellisense) for Frontend & Backend code notes](https://github.com/TriliumNext/Trilium/issues/8013)
+12.  Significant hardening of the desktop and server app by @perfectra1n and @eliandoran.
+13.  A new import mechanism allows importing from multiple applications: [OneNote notebooks using the cloud API](https://docs.triliumnotes.org/user-guide/concepts/import-export/onenote), [Notion](https://docs.triliumnotes.org/user-guide/concepts/import-export/import-from-apps/notion), [Google Keep](https://docs.triliumnotes.org/user-guide/concepts/import-export/import-from-apps/keep), [Anytype](https://docs.triliumnotes.org/user-guide/concepts/import-export/import-from-apps/anytype), [Obsidian](https://docs.triliumnotes.org/user-guide/concepts/import-export/import-from-apps/obsidian)
+14.  Significant improvements to the import/export process
+    1.  Use a better buffering system so that the memory consumption never increases proportionally to the number of notes exported.
+    2.  Display the progress of import/export.
+    3.  Use a native mechanism on desktop so that the files being imported are not copied in memory.
+    4.  Server now uses the disk to store imported files, reducing memory pressure.
+    5.  Improved compression time by skipping already compressed files.
+    6.  Improved import performance.
+15.  Significant improvements to the LLM UI by @adoriandoran: Quote content, save AI responses as subnote, regenerate responses, delete & rename chats, printing, note-tooltip, scroll-to-bottom & performance tweaks.
 
 ## 🚨 Breaking changes
 
-*   Back-end scripting:
-    *   [`api.axios` has been removed](https://docs.triliumnotes.org/user-guide/scripts/breaking-changes/axios-removal). It has already been marked as deprecated for more than two years now and given the recent security compromise and the fact that it's not actually used in the Trilium code base we took the decision to remove it completely. Please update your scripts to use the built-in `fetch()` instead.
-    *   [`api.cheerio` has been marked as deprecated](https://docs.triliumnotes.org/user-guide/scripts/breaking-changes/cheerio-deprecated), but not removed. As an alternative we provide `node-html-parser` which has a more DOM-oriented syntax.
+1.  [**Backend scripting is now disabled by default**](https://docs.triliumnotes.org/user-guide/scripts/Security).
+    1.  If you make use of these scripts, see the documentation (`config.ini` change for server or desktop settings).
+    2.  The goal of this change is to strengthen Trilium's security posture since backend scripts have dangerously powerful levels of access (e.g. full FS access). Front-end scripts are unaffected.
+2.  [**SQL console access is disabled by default**](https://docs.triliumnotes.org/user-guide/scripts/Security)**.**
+    1.  Similar to backend scripting, it can be reactivated from `config.ini`.
+3.  [The desktop application (based on Electron) has been hardened against potential RCE attacks](https://docs.triliumnotes.org/user-guide/scripts/breaking-changes/disabling-node-integration). You might have to adapt your scripts if you have front-end scripts that depend on Electron remote or the Node.js integration.
+4.  [The desktop application now no longer opens its port on the local network by default](https://docs.triliumnotes.org/user-guide/setup/desktop/network-access).
+    1.  This can generally affect you only if you are using ETAPI or desktop-to-desktop sync with your desktop client (servers are unaffected).
+    2.  This option can be changed in Options → Security.
+5.  OPML v1 export was dropped from this release, v2 which preserves basic formatting has been kept instead. The v1 is still supported for import.
 
 ## 🐞 Bugfixes
 
-1.  Save indicator not showing in quick edit popup.
-2.  [Grid of child notes does not clear floats](https://github.com/TriliumNext/Trilium/issues/8899).
-3.  Open tabs would load in the background, causing a slight performance impact.
-4.  New layout:
-    *   Save indicator would not disappear if reduced motion was activated.
-    *   [Table of contents would not refresh on formatting changes and sometimes it missed some updates.](https://github.com/TriliumNext/Trilium/issues/9174)
-5.  Missing empty icon from the default icon pack.
-6.  Board collection:
-    *   Scrolling horizontally was clipped.
-    *   Add button not snappable to on mobile.
-7.  [Invalid canvas note crashes full-text search](https://github.com/TriliumNext/Trilium/issues/9004)
-8.  Protecting or un-protecting notes does not refresh the state of the tree.
-9.  Collections will show the note list even if a protected session is not available.
-10.  Notes created from within a collection don't respect the protected state.
-11.  Long-standing issue with CSRF errors on mobile, which required a refresh.
-12.  [Setup text in DarkMode is hardly legible](https://github.com/TriliumNext/Trilium/issues/8915)
-13.  [Share: Browsing to "/share" on uninitialized setup causes crash](https://github.com/TriliumNext/Trilium/pull/9088)
-14.  [Large Equations Render over editor using Latex align environment in Display Mode](https://github.com/TriliumNext/Trilium/issues/9117)
-15.  [New layout: attribute detail modal not visible](https://github.com/TriliumNext/Trilium/issues/9005)
-16.  [The first attribute value fails to pop up the label details window correctly](https://github.com/TriliumNext/Trilium/issues/6948)
-17.  [Thumbnail images in version v0.102.1 are too small](https://github.com/TriliumNext/Trilium/issues/9116)
-18.  [PDF previews can fail between software updates due to caching issues](https://github.com/TriliumNext/Trilium/issues/9176)
-19.  [Can't print or export to PDF on Linux Wayland](https://github.com/TriliumNext/Trilium/issues/7967)
-20.  [Browsing to "/share" on uninitialized setup causes crash](https://github.com/TriliumNext/Trilium/issues/5677) by @argusagent
-21.  [Refresh content for SPAs with "query string" in hash](https://github.com/TriliumNext/Trilium/pull/8883) by @contributor
-22.  [Import file with Chinese char in file name cause random char in file name after import](https://github.com/TriliumNext/Trilium/issues/3013)
-23.  [Share: Webviews occupy too little height, making them hard to see](https://github.com/TriliumNext/Trilium/issues/9215)
-24.  [Events in calendar show as light even when dark theme is selected](https://github.com/TriliumNext/Trilium/issues/8989)
-25.  [Scripting: Preact's useContext is exported, but createContext isn't](https://github.com/TriliumNext/Trilium/issues/9152)
-26.  [Share Function - Translation not being used](https://github.com/TriliumNext/Trilium/issues/8722)
-27.  [Changing the note icon does not change the icon in the tab](https://github.com/TriliumNext/Trilium/issues/8994)
-28.  [Cannot open quick search results in new tab](https://github.com/TriliumNext/Trilium/issues/9220)
-29.  [Server & desktop not running properly if placed in a hidden directory](https://github.com/TriliumNext/Trilium/issues/8882) (e.g. `~/.local/share`).
-30.  Collections:
-    *   Not reacting to changes in note reordering.
-    *   Clicking on a URL promoted attribute in board will also open quick edit.
-31.  Performance issues when typing caused by saving the document too many times (addresses [Significant input lag and UI freezing during continuous drawing/writing (Mouse & Pen)](https://github.com/TriliumNext/Trilium/issues/9345) but also other note types as well)
-32.  Unnecessary attribute setting when editing a note in a calendar's quick edit.
-33.  [Title is no longer auto-selected when creating a new note](https://github.com/TriliumNext/Trilium/issues/8407)
-34.  [Note Map view of Hidden Notes freezes Trilium](https://github.com/TriliumNext/Trilium/issues/8916)
-35.  Search: Some user-facing error messages were not translated.
-36.  [Uncaught TypeError shown in logs when switching notes with bottom-right attribute window open](https://github.com/TriliumNext/Trilium/issues/8900)
-37.  Demo spacing and formatting issues
-38.  [Setup doesn't support trailing slash for sync](https://github.com/TriliumNext/Trilium/issues/8045)
-39.  ["Open Command Palette" shortcut opens with the '>' symbol highlighted](https://github.com/TriliumNext/Trilium/issues/7942)
-40.  [Unable to set column value to zero in table view](https://github.com/TriliumNext/Trilium/issues/6555)
-41.  [Displaying deep child notes in the Journal calendar view](https://github.com/TriliumNext/Trilium/issues/7944)
-42.  [Titles of Options are renamable](https://github.com/TriliumNext/Trilium/issues/5371)
-43.  New layout sidebar
-    *   Table of contents sometimes renders math equations multiple times
-    *   Highlights list does not show equations.
-44.  [Deleting a not displayed note will change the displayed note](https://github.com/TriliumNext/Trilium/issues/9380)
-45.  [Demo notes: statistics not working due to missing Chart.js](https://github.com/TriliumNext/Trilium/issues/4178)
-46.  [Disable "Internal trilium link (Ctrl+L)" on code-block text selection](https://github.com/TriliumNext/Trilium/issues/1712)
-47.  [Orphaned keyboardShortcuts\* options after upgrade](https://github.com/TriliumNext/Trilium/issues/4543)
-48.  [Scripting: Logging complex entities such as `api.startNote` would show `[object Object]`](https://github.com/TriliumNext/Trilium/issues/3751)
-49.  [Import from HTML does not restore indentation](https://github.com/TriliumNext/Trilium/issues/3151)
-50.  Mermaid:
-    *   [Mermaid diagram copy reference to clipboard button is broken](https://github.com/TriliumNext/Trilium/issues/9406)
-    *   [Issue with Chinese Paths on Windows](https://github.com/TriliumNext/Trilium/issues/8973)
-51.  Add an error when link couldn't be opened
-52.  [UI overlap in attribute editing](https://github.com/TriliumNext/Trilium/issues/9407) by @ZAKIURREHMAN
-53.  Some launch bar context menus were intercepted by the browser.
-54.  [ENEX import: Attachments should not be converted into separate pages](https://github.com/TriliumNext/Trilium/issues/9473)
-55.  Exporting code of type Markdown resulted in a `.mkd` or `.code` (for GFM).
-56.  Importing a Markdown file with “Import as text note” disabled would import as the wrong format (File) instead of Code.
-57.  [Text notes would print with a different font than the one in `body`.](https://github.com/TriliumNext/Trilium/issues/8097)
-58.  [The hidden notes hiearchy becomes apparent after importing a note into root](https://github.com/TriliumNext/Trilium/issues/5520)
-59.  [No focus in “Choose note type” dialog](https://github.com/TriliumNext/Trilium/issues/9433)
-60.  Markdown import: Wrong management of backtick-escaped triple backtips
-61.  Safe import strips out bookmarks from note
-62.  [Printing: Reference links not shown](https://github.com/TriliumNext/Trilium/pull/9489) by @contributor
-63.  [For publicly shared pages, the checkbox does not display on dark theme](https://github.com/TriliumNext/Trilium/issues/8944)
-64.  PDF: [Not reacting to deleting highlights or moving them around](https://github.com/TriliumNext/Trilium/issues/9069)
-65.  The help button in a dialog now opens in a separate dialog instead of closing that dialog.
-66.  Clicking on “Full search syntax help” doesn't work.
-67.  Breadcrumb: Children hidden from tree are still listed
-68.  Settings: Slashes not displayed well in the backup toast
-69.  Code notes: Line numbers are lacking a background.
-70.  Renaming an attachment won't update its name from the list.
-71.  [Tooltips in left Sidebar after unlocking db still showing \[protected\]](https://github.com/TriliumNext/Trilium/issues/9701)
-72.  [Dropdown menu transparency causes readability issue](https://github.com/TriliumNext/Trilium/issues/9534) by @adoriandoran
-73.  Switching from “View source” to another note would not show the inline actions.
-74.  [Trilium not recovering after system suspension on Ubuntu Snap](https://github.com/TriliumNext/Trilium/issues/9647)
+This release lands roughly 86 bugfixes, with a strong focus on data integrity: several issues that could overwrite note content, corrupt the database during ZIP import, or leave sync in an inconsistent state have been resolved. The remainder is steady polish across the text editor, spreadsheets, Markdown import/export, canvas notes, sharing, authentication and mobile.
+
+<details>
+    <summary>All 86 bugfixes</summary>
+    <ol>
+        <li>Backend log doesn't respect the code color theme.</li>
+        <li>Search: Wrong escape of highlighted tokens</li>
+        <li>Desktop layout doesn't respect the bottom safe area.</li>
+        <li>When refreshing the page, the sidebar shows up animated.</li>
+        <li>“Upload attachment” not working on mobile.</li>
+        <li>Text notes: Moving lines using keyboard shortcut sometimes not working</li>
+        <li>Flickering note save indicator on desktop.</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9852">Revisions: “Diff isn't available” when viewing revisions of an empty note.</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8322">Code block tries to link/create note when typing @, and suggests slash-commands when typing /</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9247">Recovered notes appear after interrupting a sync from a device that was long offline</a>
+        </li>
+        <li>Relation map:<ol><li><a href="https://github.com/TriliumNext/Trilium/issues/6929">Partially typed name being used as relation</a> by @Renatonet0</li><li><a href="https://github.com/TriliumNext/Trilium/issues/8676">Fix Chinese IME input</a> by @Dinis-Ou</li></ol></li>
+        <li><code spellcheck="false">share*</code> labels are not filtered out during safe import.</li>
+        <li>Geomap rendering raw HTML</li>
+        <li><a href="https://github.com/TriliumNext/Trilium/issues/9757">Text Notes can not add lists that are not numbered (i.e. letters)</a> by @adoriandoran</li>
+        <li>ETAPI YAML endpoint not accessible.</li>
+        <li>Status bar: Code language switcher not showing the language if it was not enabled in settings.</li>
+        <li>Spreadsheet:<ol><li><kbd>Ctrl</kbd>+<kbd>R</kbd> copies to the right, intercepting page refresh / Unnecessary save on refresh</li><li>Can't edit the same note in a split.</li><li>Save is sometimes done before recalculation, causing potential incorrect values.</li><li>Unnecessary save when first showing some spreadsheets.</li><li>Exporting as a single file results in a .undefined file with zero content.</li></ol></li>
+        <li>Calendar collection not occupying 100% height.</li>
+        <li>Formatting toolbar not showing after temporarily editing a note in the old layout.</li>
+        <li>New layout: Note map not visible on text notes</li>
+        <li>Not all notes in a split loading after a refresh.</li>
+        <li>Background effects interfere with shadow on Linux.</li>
+        <li>AI: Extended thinking not working in some models</li>
+        <li>Markdown: colspans and rowspans are not preserved during editing</li>
+        <li>Read-only Mermaid diagrams not always rendering</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9614">Notes being overwritten with another note</a>
+        </li>
+        <li>Changes to AI providers not refreshing the sidebar.</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10179">Markdown: wrong escape of dollar signs</a>
+        </li>
+        <li>TOTP: Entering a wrong password uses up the recovery code</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/7250">OIDC credentials are not checked for</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/6387">Current OpenID Connect Implementation is not compatible with Authelia</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10084">New checkbox rows are already prechecked when previous row was checked</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10104">Spreadsheet not localized</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10095">Move line up/down doesn't always work</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8991">Scroll position is lost when the editor reinitializes.</a>
+        </li>
+        <li>Periodic hidden subtree checks causes the text editor to refresh.&nbsp;</li>
+        <li>Missing blurred background for the icon switcher for the inline title.</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10236">Geomaps breaking with GPX (entire navigation breaks)</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/7263">Tree position resets to top when switching between tabs with different workspaces/hoisted notes.</a>
+        </li>
+        <li><a href="https://github.com/TriliumNext/Trilium/issues/10253">Formatting toolbar remains visible after changing note type</a> by @SiriusXT</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8383">Markdown import: preserve heading hierarchy instead of flattening to H2</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10112">Exports: filename length is capped to 30 characters</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10268">Markdown rending issues when using multiple "$" in Code Block inside Blockquote</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10270">Tables not rendering properly in read-only after a Markdown import</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9751">The delete attachment confirmation dialog does not auto-select "OK"</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/5118">Misleading "Copy link to clipboard" for attachments</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9598">Backend crash on abrupt WS disconnect</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8187">Allow creating notes from relation auto-complete</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8330">Can't confirm inline note creation via keyboard</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8497">Time offset in Log - 24 hours (timestamps today are showing as yesterday)</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8323">Enabling showLoginInShareTheme does not enable login from base domain</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/7869">Docker deployment, when accessing the webpage, the following prompt appears: Share root not found. Please set up a note with #shareRoot label first.</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9752">Video/audio players' seek forward button has incorrect text</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/5818">Converting an attachment to a note breaks links</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9523">Built-in LaTeX editor generates \differentialD, which is not supported by the renderer</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/8318">Share: Table of contents scrolls to the wrong position for duplicate headings.</a>
+        </li>
+        <li>Importing a ZIP archive that contained a root note with content would corrupt the database.</li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/10315">ignore IME composition Enter when editing card and column titles</a> by @greymoth-jp</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9741">Zooming shortcut Ctrl+ doesn't work on German Keyboard</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9717">Shared note with a large code note freeze the server</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/6134">The checkbox and cursor in the to-do list are too close</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10347">Table: boolean column sorting not always working &amp; row number appear shuffled when sorting</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10340">Include note would render recursively for nested includes, causing performance concerns</a>
+        </li>
+        <li>Old layout: removed collection properties in the ribbon since they are duplicated with the collection bar.</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10406">Search does not find protected notes while being in protected session</a>
+        </li>
+        <li>Markdown import/export<ol><li><a href="https://github.com/TriliumNext/Trilium/issues/10418">Some equations containing HTML-like characters are broken</a></li><li>A table with no heading row but with heading columns will end up having an empty row when reimported.</li></ol></li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10407">Tree can crash in some rare circumstances while updating itself</a>
+        </li>
+        <li>“Blob not found” when deleting the active note.</li>
+        <li>Table of contents becoming stale when switching between two notes with many headings.</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/7148">CTRL-Z with two Canvas notes will delete previous drawing</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/6447">Canvas notes sometimes fail to render</a>
+        </li>
+        <li>New layout: Note map not shown in empty note type switcher</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10115">Some protected notes and notes titles are still displayed after inactivity delay</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9754">JavaScript error while OCR processing existing image files</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/9565">Day notes title pattern replacements not working</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/3015">Template collision for Code note</a>
+        </li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/10292">Fix calendar events that cross midnight not showing up</a> by @Glitch752</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10444">Mermaid images not visible in HTML or share export</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/3235">Electron can sometimes crash due to a connection error</a>
+        </li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10478">Mindmap freezes on save on medium or larger notes</a>
+        </li>
+        <li><a href="https://github.com/TriliumNext/Trilium/issues/5669">Add link dialog fails to link if you press enter twice too quickly</a> by @mvanhorn &amp; @eliandoran</li>
+        <li>PDF<ol><li><a href="https://github.com/TriliumNext/Trilium/pull/10048">PDF download: name not preserved</a> by @Excubitorum &amp; @eliandoran</li><li>Annotations are not saved immediately, only after closing the annotation tool.</li><li>Unnecessary confirmation screen when navigating a way after the annotations have already been saved.</li></ol></li>
+        <li>When pasting an image, srcset bypasses Trilium's downloaded image.</li>
+        <li><a href="https://github.com/TriliumNext/Trilium/issues/10493">Canvas notes zooms out to 10% when using flowchart keyboard shortcuts</a>.</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/10110">PDF viewer not showing properly in attachments</a>
+        </li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/10292">Calendar events spanning day boundaries without an end date</a> by @Glitch752</li>
+    </ol>
+</details>
 
 ## ✨ Improvements
 
-1.  Videos & audio files imported in Trilium now have a new default icon and the extension will be trimmed.
-2.  [Improved the design of the video and audio player](https://github.com/TriliumNext/Trilium/issues/8895) and added additional functionality such as easy seeking, rotation, picture-in-picture.
-3.  Mermaid:
-    *   Added a list of example diagrams that are shown when Mermaid notes are empty, for getting started quickly. All the supported diagrams types were added.
-    *   As a result of the previous change, new Mermaid diagrams start out as empty instead of a generic flowchart diagram.
-    *   Updated the version of Mermaid which brings in two new diagram types: [Venn](https://github.com/mermaid-js/mermaid/pull/5932) and [Ishikawa](https://github.com/mermaid-js/mermaid/pull/7387).
-4.  [Space mobile launcher container evenly](https://github.com/TriliumNext/Trilium/pull/9031) by @Mystler
-5.  PDF: [Inline toolbar with highlight and comment](https://github.com/TriliumNext/Trilium/pull/9048) by @contributor
-6.  Add Catppuccin theme to both [code notes](https://github.com/TriliumNext/Trilium/pull/9060) and [code blocks](https://github.com/TriliumNext/Trilium/pull/9075) by @giuxtaposition
-7.  Added four more themes to code notes: High Contrast Dark, High Contrast Light, Material Ocean, and Synthwave '84
-8.  Relation map: Add more options to open notes in the context menu
-9.  [Improve database performance by adding new indices](https://github.com/TriliumNext/Trilium/pull/9141) (by @perfectra1n).
-10.  CKEditor was updated to v48 with the most notable change of being able to change the alignment of tables with or without text wrapping (see [#5791](https://github.com/TriliumNext/Trilium/issues/5791)).
-11.  Mermaid diagrams were updated which brings in two new diagram types: TreeView and Wardley Maps.
-12.  Inline mermaid diagrams use a more modern approach to rendering, which should reduce flicker.
-13.  [Relation map: rename relations through context menu](https://github.com/TriliumNext/Trilium/issues/442)
-14.  Share: Render dates on the client to match their locale.
-15.  Backend script: add an API to execute other backend scripts.
-16.  [Download button for backups](https://github.com/TriliumNext/Trilium/pull/9190) by @Lorinc936
-17.  Search:
-    *   [Improve the error messages to be more user-friendly when searching for keywords without quotes or entering text after expressions](https://github.com/TriliumNext/Trilium/issues/8850)
-    *   [Add a way to open all the results in a new tab](https://github.com/TriliumNext/Trilium/issues/5376)
-    *   [Improve search performance by using caches and optimizing algorithms](https://github.com/TriliumNext/Trilium/pull/9034) by @perfectra1n
-    *   [Option to easily toggle the fuzzy search on/off](https://github.com/TriliumNext/Trilium/issues/9009) by @perfectra1n
-    *   [Option to disable fuzzy search in copy/clone](https://github.com/TriliumNext/Trilium/issues/8360)
-18.  [Displaying note icon when creating an inline note link, using @](https://github.com/TriliumNext/Trilium/issues/8188)
-19.  [Friendly numbers in settings: Sync timeout](https://github.com/TriliumNext/Trilium/issues/5513) and Zoom factor (percent better than decimal factor)
-20.  [Copy button for inline code (via toolbar for editable notes and clicking for read-only notes)](https://github.com/TriliumNext/Trilium/issues/8720)
-21.  Admonitions now have a floating toolbar to quickly change their type.
-22.  [Warn if user is trying to run the script in a wrong environment](https://github.com/TriliumNext/Trilium/issues/342)
-23.  [Open internal link (`bookends:`, `highlights:`) in OSX apps](https://github.com/TriliumNext/Trilium/issues/2817)
-24.  [Script execution should error out on usage of protected notes outside of protected session](https://github.com/TriliumNext/Trilium/issues/21)
-25.  ["Delete all clones" checkbox should have a different message if there are no clones](https://github.com/TriliumNext/Trilium/issues/2362)
-26.  [Improve note path display to use chevrons instead of slashes to separate notes](https://github.com/TriliumNext/Trilium/issues/762)
-27.  [Changing the size of include notes after they were created](https://github.com/TriliumNext/Trilium/issues/3705)
-28.  [Add 'Expandable' option to Include Note feature](https://github.com/TriliumNext/Trilium/issues/4134)
-29.  [Remember default box size for included notes](https://github.com/TriliumNext/Trilium/issues/1623)
-30.  [Hide hidden notes from similar notes view](https://github.com/TriliumNext/Trilium/issues/4584)
-31.  Modernized a bit the delete preview.
-32.  Improved all the settings pages by using a unified layout, more interactive widgets for layout, theme selection and making use of modals. Some cards were combined together.
-33.  “View source” is now searchable.
-34.  Every item on the launch bar now has a contextual menu which allows easily removing the item from the bar.
-35.  Attachments: preview text in files, provided the MIME type is correct.
-36.  [Syntax highlighting for code blocks inside Markdown notes](https://github.com/TriliumNext/Trilium/issues/9150)
-37.  [Provide a way to customize Electron data directory](https://github.com/TriliumNext/Trilium/issues/4192)
-38.  Printing text notes now respects the font selection in settings.
-39.  Revisions:
-    *   Basic rich diff when comparing text note
-    *   Allow adding a description to manually created revisions
-    *   Automatically tag revisions based on their source.
-    *   Improve diff for code notes, by preserving monospace.
-    *   Indicate the source of a revision: manual save, automatic snapshot, ETAPI, LLM change
-    *   Keyboard shortcut and option in note menu to save a named action.
-40.  [Redesign of the about dialog](https://github.com/TriliumNext/Trilium/pull/9151) by @adoriandoran
-41.  Note attributes pane: add a help button
-42.  Tree: do not allow to hide the children of the root element
-43.  Improved keyboard markers in Text notes
-    *   Improved style
-    *   Can now be exited out of by moving the cursor, just like inline code.
-44.  PDF
-    *   Added read-only support to disable editing features.
-    *   Shared notes now render using the browser's internal PDF viewer which allows downloading and bypasses some potential issues with reverse proxies.
-    *   UI language was not always set correctly.
-    *   Can now be printed or searched through from the note actions menu.
-45.  Sidebar (new layout):
-    *   Improved the layout slightly.
-    *   PDF page preview: use virtualization for better performance in large documents.
-    *   PDF highlights and annotations are now listed in the sidebar in a separate section
-46.  [Import: Support ZIPs with GBK encoding](https://github.com/TriliumNext/Trilium/issues/9678)
-47.  Attachments list: improve the display when there are no attachments.
-48.  Syntax highlighting for Markdown now follows the GitHub flavor.
-49.  [Reintroduced the sync indicator for mobile (useful when using the third-party Pocket Trilium app).](https://github.com/TriliumNext/Trilium/issues/9663)
-50.  API logging:
-    *   `api.log` now supports multiple arguments, similar to the syntax of `console.log`.
-    *   API log text not selectable.
-51.  [Various UI improvements](https://github.com/TriliumNext/Trilium/pull/9662) by @adoriandoran
-52.  LLM: [Stop generation button](https://github.com/TriliumNext/Trilium/pull/9341) by @Kureii
+Beyond the headline features, 68 smaller improvements round off nearly every corner of the app. Several are worth calling out: **pinned tabs** and a reworked tab bar, a **right sidebar toggle handle with peek mode**, and **options that now open in a modal** by default instead of a new tab — changes you'll notice within minutes of upgrading. Media notes get a proper treatment too, with a **new gallery-style image viewer** (zoom, keyboard navigation) and an **overhauled media player** (previous/next, play modes, Media Session API integration), while **Include note** now renders collections, web views and saved searches interactively, and canvas notes can embed other notes and store images as attachments.
 
-## 📖 Documentation
+Markdown continues to become a first-class citizen: you can now **convert text notes to Markdown and back**, with snippets, code-block language autocompletion and cleaner "Copy as Markdown" output. The settings screens follow the setup redesign — the **keyboard shortcuts section** was rebuilt around a key recorder with conflict detection, and **multi-factor authentication** moved into _Password & auth_ with QR generation and TOTP validation. The rest is steady polish: the LLM assistant became noticeably smarter and smoother; spreadsheets, the backend log and the import/export dialogs all received meaningful upgrades; and the desktop app gained conveniences like tray hiding and start-on-login.
 
-1.  [How spell check works, including custom dictionary.](https://docs.triliumnotes.org/user-guide/note-types/text/spellcheck)
-2.  Word count widget doesn't mention the use of attribute
-3.  Dedicate page for the license
-4.  Improved resetting password
-5.  Documented the concept of content width.
-6.  [Broken image for linux distribution in README](https://github.com/TriliumNext/Trilium/issues/9608) by @vayungodara
+<details>
+    <summary>All 68 improvements</summary>
+    <ol>
+        <li>Setup redesign<ol><li>Language selection screen.</li><li>Clarified the desktop to desktop sync.</li><li>Demo content can be optionally skipped if creating a new document.</li><li>Improve mobile support.</li><li>Background effects for Windows 11 and macOS.</li><li>Redesigned the login and set password screens as well.</li></ol></li>
+        <li>Markdown: Minor improvements to slash commands.</li>
+        <li>Import: Ignore macOS metadata when importing a ZIP</li>
+        <li>Back-end log<ol><li>Customizable word wrap</li><li>Integrate with search</li><li>Add a dedicated download button.</li><li>Get rid of <code spellcheck="false">Slow 200 GET /api/backend-log with 19200316 bytes took 75ms</code>.</li></ol></li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/9840">Text notes: Increase blockquote padding</a> by @bigbangcmbr</li>
+        <li>Improved the display of revisions in case a diff is not available or the revision is identical to the current note content.</li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/9881">Text editor: configurable multi-state todo list checkboxes</a> by @adoriandoran</li>
+        <li>LLM<ol><li>Add an option to display history of chat notes</li><li>Backlink support, based on reference links used by the assistant and tool calls.</li><li>In-progress tool calls are also displayed.</li><li>Reference links can be inserted by the user using @-mention</li><li>Handle Gemini not supporting both note tools and note search</li><li>Improve skill loading and render note for some models</li><li>Smoother streaming effect</li><li>Improved the backend and frontend skills for the LLM.</li><li>Added a tool to search for icons.</li><li>Add Claude Sonnet 5 &amp; Fable.</li><li>Improved UX by @adoriandoran</li><li>Table of contents, text highlight support by @adoriandoran</li><li>Improved the “Add provider” screen.</li><li>Improved the model selector and fixed legacy models not showing in the sidebar.</li></ol></li>
+        <li>Markdown<ol><li>Interpret Markdown in table of contents.</li><li>Improve table design and margins.</li></ol></li>
+        <li>Toasts are now selectable</li>
+        <li>Various UI improvements by @adoriandoran</li>
+        <li>Add separate language code for plain JavaScript<br>Text notes no longer have frontend and backend-specific versions of JavaScript</li>
+        <li>Spreadsheet<ol><li>Trim the saved data slightly.</li><li>Improved rendering in the share and printing (borders, colors, number and date formatting).</li><li><a href="https://github.com/TriliumNext/Trilium/issues/9851">Added support for images</a></li><li>Added support for mobile, making interaction much easier such as drag to pan instead of selection.</li></ol></li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/10025">Snippet support for code notes and Markdown notes</a> by @adoriandoran</li>
+        <li>New image viewer by @adoriandoran with gallery-style navigation, zoom and keyboard navigation.</li>
+        <li>Media Player improvements by @adoriandoran<ol><li>Add previous/next navigation for audio and video</li><li>Media Session API integration</li><li>Play mode options</li><li>Compact media player UI</li></ol></li>
+        <li>Improve fit and layout of the print preview dialog.</li>
+        <li>Print: improved the layout and design of footnotes</li>
+        <li>Quick edit: Reference links now open in the same popup instead in the background</li>
+        <li>Options<ol><li>Seamless transition when switching themes, fonts or editor layout</li><li>Improved the layout and appearance of backups and anonymized databases.</li><li>Options now open by default in a modal instead of in a new tab.</li></ol></li>
+        <li>Show an indicator when loading a blob takes too much.</li>
+        <li>Dedicated content badge for custom request handler</li>
+        <li>
+            <a href="https://github.com/TriliumNext/Trilium/issues/2710">Open tabs nearby instead of at the end</a>
+        </li>
+        <li>Allow viewing source of SVG files</li>
+        <li>Include note now renders some note types interactively such as collections, webviews or saved searches.</li>
+        <li>Canvas notes:<ol><li>Notes can now be embedded in a similar way to <em>Include note</em> in text notes.</li><li>Images for canvas notes are now saved as attachments which should reduce the performance hit when modifying canvases with large images.</li></ol></li>
+        <li>Improved the design of included notes.</li>
+        <li>Launch bar configuration now opens in a modal.</li>
+        <li>Improved revision dialog layout on mobile.</li>
+        <li>Added linters:<ol><li>Mermaid: reporting parsing errors &amp; improved error display.</li><li>JSON</li></ol></li>
+        <li>Improved error tolerance for rendering math equations.</li>
+        <li>Redesigned the keyboard shortcuts section with a key recorder instead of manual entry and conflict detection.</li>
+        <li>Redesigned the multi-factor authentication section (including QR code generation and validation of TOTP) and integrated it directly in <em>Password &amp; auth</em>.</li>
+        <li>Improved OAuth connection flow, including display of the OAuth provider info (URL, name, icon).</li>
+        <li>Improved detection of the OAuth provider icon, instead of falling back to Google's.</li>
+        <li>Removed the default key binding for “Switch to Last Tab" since it overlaps with “Reset zoom” (Ctrl+0).</li>
+        <li>Script API (both front-end and back-end) now have bidirectional Markdown / HTML conversion (<code spellcheck="false">htmlToMarkdown</code>, <code spellcheck="false">markdownToHtml</code>) by @misch334 &amp; @eliandoran</li>
+        <li>Notes can be toggled full-width from the note contextual menu (new layout only).</li>
+        <li>Adjustments to the safe import for text notes: preserve underline text, list types, transparent table borders.</li>
+        <li>Added a progress bar to the import notification.</li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/10237">Option to disable tree scroll-follows-navigation</a> by @kleutzinger</li>
+        <li>Markdown:<ol><li>Added snippets for page-break and table.</li><li>Added auto-completion for code block language tags.</li><li>When exporting, format HTML-based tables with proper indentation &amp; newlines.</li></ol></li>
+        <li>Spreadsheet: prevent jumping to the beginning/end when navigating at the edge</li>
+        <li>The import dialog has been restructured to take into consideration support for new app-based imports (OneNote, Notion, AnyType).</li>
+        <li>The export dialog has been simplified.</li>
+        <li>Pressing enter in the note title will now focus the content and insert a new paragraph/line for text &amp; code notes.</li>
+        <li>Calendar: add a button to pin the current date</li>
+        <li>Tree: Prevent accidentally importing above/below the hoisted note.</li>
+        <li>Turned a few info dialogs into toasts.</li>
+        <li>Mermaid updated with three new diagram types: Cynefin, Swimlane &amp; Railroad</li>
+        <li>Improve backend log with features such as syntax highlighting by @adoriandoran</li>
+        <li>Various UI improvements by @adoriandoran</li>
+        <li><a href="https://github.com/TriliumNext/Trilium/pull/8880">Calendar: Add slotDuration and slotLabelInterval, Add Day View</a> by @BeatLink</li>
+        <li>Desktop installer: improved the installation animation on Windows and background on macOS</li>
+        <li>Keyboard shortcuts now display localized names and macOS-specific glyphs.</li>
+        <li>HTML &amp; Markdown export: remove redundant <code spellcheck="false">data-list-id</code> from list items.</li>
+        <li>Code notes: add Nim language support by @dirtboll</li>
+        <li><a href="https://docs.triliumnotes.org/user-guide/concepts/import-export/import-from-apps/evernote">Evernote</a> was enhanced with TODO list support, internal link detection and extended formatting such as admonitions.</li>
+        <li>The desktop app gains two more features:<ol><li>Hiding to system tray when the last window is closed.</li><li>Automatically starting up on login.</li></ol></li>
+        <li>Pinned tabs &amp; various tab bar improvements by @adoriandoran</li>
+        <li>Right sidebar toggle handle &amp; peek mode by @adoriandoran</li>
+        <li>Improvements to deleted notes dialog by @adoriandoran</li>
+        <li>Icon pack preview by @adoriandoran</li>
+        <li>Markdown: Convert text notes to Markdown and vice-versa by @adoriandoran</li>
+        <li>Text notes:<ol><li>Undo &amp; Redo buttons for the fixed toolbar by @adoriandoran.</li><li>“Copy as Markdown” now renders more cleanly (fewer HTML attributes).</li></ol></li>
+        <li>Contextual shortcut hints by @adoriandoran</li>
+        <li>Improved error management for render notes and backend scripts.</li>
+        <li>PDF: added support for drawn signatures</li>
+        <li>New launch bar buttons by @adoriandoran<ol><li>Color scheme switcher</li><li>Deleted notes</li></ol></li>
+    </ol>
+</details>
 
 ## 🌍 Internationalization
 
-1.  Czech support by @Kureii
-2.  Wrong password message not translated.
-3.  Added Uyghur as [content language](https://docs.triliumnotes.org/user-guide/note-types/text/content-language)
+*   Reach 100% coverage for Romanian.
+*   Added Indonesian.
+
+## 📖 Documentation
+
+*   Clarify Script API context (`startNote`, `currentNote`, `originEntity`).
+*   Documented some missing labels and relations.
+*   Documented `color` attribute.
+*   [Some links (to hidden notes or options pages) were broken.](https://github.com/TriliumNext/Trilium/issues/9646)
+*   Documented the note title.
+*   Documented new features.
 
 ## 🛠️ Technical updates
 
-1.  [Remove Knockout from setup page](https://github.com/TriliumNext/Trilium/pull/9102) by @JYC333
-2.  Many dependency updates.
+1.  Remove unnecessary boxicon assets.
+2.  Cleaned up a few dependencies.
+3.  Complete architectural change to allow for a new deployment mechanism: [standalone mode](https://github.com/orgs/TriliumNext/discussions/9733).
+4.  Many dependency updates.
+5.  [Opt-in to disable automatic DB migration](https://github.com/TriliumNext/Trilium/pull/9449) by @contributor
+6.  Disable background effects while dev tools is attached to the same window
+7.  Improved the loading time of the client by lazy loading libraries and dialogs
+8.  Improved the loading time of the desktop slightly by loading the server at the same time as Electron starts.
 
-## 🔒️ Security improvements
+## 🔒️ Security fixes
 
-1.  Low: [SQL Injection via Unsanitized URL Parameter in \`getDayNotesForMonth\`](https://github.com/TriliumNext/Trilium/security/advisories/GHSA-64fm-4j23-99j2)
-2.  Low: [Stored XSS via unescaped shareExternalLink label in share index page](https://github.com/TriliumNext/Trilium/security/advisories/GHSA-97mx-2qjm-qhfx)
+Security is a central theme of this release: 16 fixes systematically shrink Trilium's attack surface. Content is now sanitized on every path (HTML, SVG, collections, shared notes), injection vectors (SQL, path traversal, SSRF) have been hardened, sessions and cookies tightened, and the Electron desktop app locked down with strict permission, navigation and session-isolation policies. These fixes go hand in hand with the deliberate breaking changes above — together they make the default configuration significantly safer.
+
+<details>
+    <summary>All 16 security fixes</summary>
+    <ol>
+        <li><code spellcheck="false">require()</code> in backend scripts is now allow/block-listed</li>
+        <li>Title templates &amp; bulk-rename no longer use <code spellcheck="false">eval()</code></li>
+        <li>Note content is now HTML-sanitized on non-editor paths</li>
+        <li>Table of Contents &amp; Highlights list strip block elements</li>
+        <li>Improved SVG sanitization.</li>
+        <li>Shared/published notes: CSP, and escaping<ul><li><strong>Custom </strong><code spellcheck="false"><strong>#shareTemplate</strong></code><strong> is ignored when backend scripting is disabled</strong> (EJS can run JS) — shared pages fall back to the default theme.</li><li><code spellcheck="false">#shareRaw</code> is now flagged <code spellcheck="false">isDangerous</code> in attribute UI; raw HTML shares are still intentionally served unrestricted (opt-in).</li></ul></li>
+        <li>Session &amp; cookie hardening</li>
+        <li>API keys for LLM agents are no now write-only through the options API.</li>
+        <li>Backup name sanitization</li>
+        <li>SSRF / local file disclosure via image download</li>
+        <li>Path-traversal hardening on file-upload endpoints</li>
+        <li>SQL injection hardening</li>
+        <li>Sanitize content of Collections and Mind Maps.</li>
+        <li>Hardened the optional MCP server against DNS rebinding attacks.</li>
+        <li>Hardening of the Electron app<ul><li><code spellcheck="false">&lt;webview&gt;</code> attach vetting</li><li>Dedicated guest session partition: Web View notes now load in <code spellcheck="false">persist:webview</code> instead of sharing the renderer session, so embedded sites can never see Trilium cookies or resolve the <code spellcheck="false">trilium-app://</code> scheme.</li><li>Deny-by-default permission policy. App session allows <code spellcheck="false">clipboard-sanitized-write</code>, <code spellcheck="false">fullscreen</code>, <code spellcheck="false">notifications</code> (user scripts use <code spellcheck="false">new Notification()</code>); guests get <code spellcheck="false">fullscreen</code> only.</li><li>Scheme allowlist for external opens: <code spellcheck="false">window.open</code>/target=_blank URLs are validated before <code spellcheck="false">shell.openExternal</code></li><li>Global window-open &amp; navigation policy</li><li>Origin gate on <code spellcheck="false">trilium-app://</code> dispatch</li></ul></li>
+        <li>Shared notes:<ul><li>Prevent accessing (encrypted, not plain text) protected attachments.</li><li>Improved filtering of some attributes.</li></ul></li>
+    </ol>
+</details>
