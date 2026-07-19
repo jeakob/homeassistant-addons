@@ -1,6 +1,6 @@
 <img src="https://github.com/jeakob/homeassistant-addons/raw/main/trillium/icon.png" width="100" height="100">
 
-# TriliumNext Notes Version: v0.103.0 for Home Assistant
+# TriliumNext Notes Version: v0.104.0 for Home Assistant
 
 
 ## About
