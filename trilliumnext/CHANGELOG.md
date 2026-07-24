@@ -36,16 +36,17 @@ On top of that come a redesigned setup and login experience, better AI integrati
 
 ## 🚨 Breaking changes
 
-1.  [**Backend scripting is now disabled by default**](https://docs.triliumnotes.org/user-guide/scripts/Security).
+1.  [**Backend scripting is now disabled by default**](https://docs.triliumnotes.org/user-guide/scripts/security).
     1.  If you make use of these scripts, see the documentation (`config.ini` change for server or desktop settings).
     2.  The goal of this change is to strengthen Trilium's security posture since backend scripts have dangerously powerful levels of access (e.g. full FS access). Front-end scripts are unaffected.
-2.  [**SQL console access is disabled by default**](https://docs.triliumnotes.org/user-guide/scripts/Security)**.**
+2.  [**SQL console access is disabled by default**](https://docs.triliumnotes.org/user-guide/scripts/security)**.**
     1.  Similar to backend scripting, it can be reactivated from `config.ini`.
 3.  [The desktop application (based on Electron) has been hardened against potential RCE attacks](https://docs.triliumnotes.org/user-guide/scripts/breaking-changes/disabling-node-integration). You might have to adapt your scripts if you have front-end scripts that depend on Electron remote or the Node.js integration.
 4.  [The desktop application now no longer opens its port on the local network by default](https://docs.triliumnotes.org/user-guide/setup/desktop/network-access).
     1.  This can generally affect you only if you are using ETAPI or desktop-to-desktop sync with your desktop client (servers are unaffected).
     2.  This option can be changed in Options → Security.
 5.  OPML v1 export was dropped from this release, v2 which preserves basic formatting has been kept instead. The v1 is still supported for import.
+
 
 ## 🐞 Bugfixes
 
